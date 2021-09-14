@@ -1,1 +1,4 @@
 TODO: Add README.txt file describing how to compile and run the program
+
+OPTIONAL
+TODO: Add completion text next to the right of progress bar, e.g. "24.83%"

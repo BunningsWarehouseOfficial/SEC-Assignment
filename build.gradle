@@ -24,5 +24,5 @@ javafx {
 
 application {
     // Define the main class for the application
-    mainClassName = 'edu.curtin.krados.comp3003.assignment1.SillyClassNamePleaseChange'
+    mainClassName = 'edu.curtin.krados.comp3003.assignment1.FileComparer'
 }

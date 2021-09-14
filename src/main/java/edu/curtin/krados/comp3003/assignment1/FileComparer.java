@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.*;
 
-public class SillyClassNamePleaseChange extends Application
+public class FileComparer extends Application
 {
     public static void main(String[] args)
     {
@@ -24,7 +24,7 @@ public class SillyClassNamePleaseChange extends Application
     @Override
     public void start(Stage stage)
     {
-        stage.setTitle("SillyWindowTitlePleaseChange");
+        stage.setTitle("Papers, Please");
         stage.setMinWidth(600);
 
         // Create toolbar
@@ -36,7 +36,7 @@ public class SillyClassNamePleaseChange extends Application
         compareBtn.setOnAction(event -> crossCompare(stage));
         stopBtn.setOnAction(event -> stopComparison());
         
-        // Initialise progressbar
+        // Initialise progress bar
         progressBar.setProgress(0.0);
         
         TableColumn<ComparisonResult,String> file1Col = new TableColumn<>("File 1");
@@ -84,13 +84,20 @@ public class SillyClassNamePleaseChange extends Application
         File directory = dc.showDialog(stage);
         
         System.out.println("Comparing files within " + directory + "...");
+
+        //TODO: Start producer thread(s) to find all non empty (size > 0) text files (.txt, .md, .java, .cs)
+        //TODO: Re-calculate numMaxComparisons on the fly based on increasing numFiles: c = 0.5 * (f^2 - f) and
+        //      atomically update synchronized variable accessible by consumer comparison threads
+
+        //TODO: Create consumer thread pool for comparisons, with thread for each file, but a capped max thread count?
+        //TODO: Update resultTable with .runLater() if similarity > 0.5
+        //TODO: Call function that can only run one at a time (i.e. in GUI thread?) or that locks numCompared and
+        //      numMaxComparison, and use them to calculate percent completion and update progressBar with .runLater()
+        //TODO: Add each ComparisonResult to newResults blocking queue to be consumed/written by a file writer thread
+        //      into results.csv
         
         // Extremely fake way of demonstrating how to use the progress bar (noting that it can 
         // actually only be set to one value, from 0-1, at a time.)
-        progressBar.setProgress(0.25);
-        progressBar.setProgress(0.5);
-        progressBar.setProgress(0.6);
-        progressBar.setProgress(0.85);
         progressBar.setProgress(1.0);
 
         // Extremely fake way of demonstrating how to update the table (noting that this shouldn't
@@ -107,6 +114,8 @@ public class SillyClassNamePleaseChange extends Application
     
     private void stopComparison()
     {
+        //TODO: Stop/interrupt producer thread pool and all threads
+
         System.out.println("Stopping comparison...");
     }
 }
