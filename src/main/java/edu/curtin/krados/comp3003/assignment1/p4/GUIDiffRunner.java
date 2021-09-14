@@ -1,8 +1,7 @@
-package edu.curtin.krados.comp3003.assignment1;
+package edu.curtin.krados.comp3003.assignment1.p4;
 
 import java.io.*;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 /**
