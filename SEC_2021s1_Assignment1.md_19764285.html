@@ -1,0 +1,669 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8" />
+                <title>Assignment 1</title>
+                <style>
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&family=Merriweather+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@500&family=Merriweather&family=Merriweather+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+
+
+
+@media screen {
+    html { background: #404040; }
+    body {
+        background: 
+    }
+}
+
+html {
+
+
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.8em;
+    background: #404040;
+}
+
+body {
+    background: white;
+    max-width: 50em;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 4em;
+
+    counter-reset: section;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', serif;
+}
+
+h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+}
+
+h2:not(.notnumbered) {
+    counter-reset: subsection;
+    counter-increment: section;
+}
+
+h2:not(.notnumbered)::before {
+    content: counter(section);
+    margin-right: 1em;
+}
+
+h3:not(.notnumbered) {
+    counter-reset: subsubsection;
+    counter-increment: subsection;
+}
+
+h3:not(.notnumbered)::before {
+    content: counter(section) "." counter(subsection);
+    margin-right: 1em;
+}
+
+h4:not(.notnumbered) {
+    counter-increment: subsubsection;
+}
+
+h4:not(.notnumbered)::before {
+    content: counter(section) "." counter(subsection) "." counter(subsubsection);
+    margin-right: 1em;
+}
+
+
+
+
+pre {
+    line-height: 1.7em;    
+}
+
+code {
+    font-family: 'Inconsolata', monospace;
+}
+
+.unixcmd::before, .wincmd::before, [prompt]::before, .unixcmd br+::before, .wincmd br+::before, [prompt] br+::before {
+    font-family: 'Inconsolata', monospace;
+    color: #808080;    
+}
+
+.unixcmd::before, .unixcmd br+::before {
+    content: "[user@pc]$ ";
+}
+
+.wincmd::before, wincmd br+::before {
+    content: "C:\\> ";
+}
+
+[prompt]::before, [prompt] br+::before {
+    content: attr(prompt) " ";
+}
+
+code .c1, code .cm { color: #c06000; } 
+code .k, code .kd, code .kt { color: blue; }    
+code .o, code .p   { color: red; }     
+code .s            { color: green; }   
+code .mi, code .mf, 
+code .mh, code .mb { color: #008080; } 
+
+
+
+
+.admonition {
+    border-radius: 5px;
+    border: 1px solid #606060;
+    padding: 0 1em;
+    margin: 1ex 0;
+}
+
+.admonition-title {
+    font-weight: bold;
+    font-family: 'Merriweather Sans', sans-serif;
+}
+
+.admonition.note {
+    border: 1px solid #0060c0;
+    background: #c0d8ff;
+}
+
+.admonition.warning {
+    border: 1px solid #c03030;
+    background: #ffc0c0;
+}
+
+.admonition.answer {
+
+    border: 1px solid #c000c0;
+    background: #ffe0ff;
+}
+
+
+
+
+ul > li::marker {
+    color: #0080ff;
+    content: '\25A0\00A0';
+}
+
+ul ul > li::marker {
+    color: #80c0ff;
+    content: '\25B8\00A0';
+}
+
+ol {
+    width: 100%;
+    counter-reset: listitem;
+
+    padding: 0;
+}
+
+ol > li {
+    display: table;
+    counter-increment: listitem;
+}
+
+ol > li::before {
+    content: counters(listitem, ".") ". ";
+    display: table-cell;
+    width: 2ex;
+    padding-right: 0.5em;
+    color: #ff6000;
+    font-weight: bold;
+}
+
+ol ol > li::before {
+    width: 3ex;
+}
+
+ol ol ol > li::before {
+    width: 4ex;
+}
+
+.alpha + ol > li::before {
+    content: "(" counter(listitem, lower-alpha) ") ";
+}
+
+.roman + ol > li::before {
+    content: "(" counter(listitem, lower-roman) ") ";
+}
+
+li {
+    margin: 0.5em 0 0.5em 0;
+    padding-left: 0.5em;
+    padding-top: 0em;
+    width: calc(100% - 1ex);
+}
+
+
+ol > li > p:first-child {
+    
+    margin-top: 0;
+}
+
+ol > li > :last-child {
+    margin-bottom: 0;
+}
+
+
+
+table {
+    border-collapse: collapse;
+    border-bottom: 1px solid black;
+}
+
+table thead tr {
+    background-color: #ffc080;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+td, th {
+    padding: 0.5em 1em;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: white;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #fff0e0;
+}
+
+
+
+
+[nmarks]:not([nmarks="1"])::after {
+    content: "[" attr(nmarks) " marks]";
+}
+
+[nmarks="1"]::after {
+    content: "[1 mark]";
+}
+
+[nmarks]::after {
+    display: block;
+    text-align: right;
+    font-weight: bold;
+
+
+    position: relative;
+}
+
+.inline {
+    position: relative;
+}
+
+.inline[nmarks]::after {
+    position: absolute;
+    right: 0pt;
+    bottom: 0pt;
+
+
+}
+
+</style>
+            <style> body { background: url("data:image/svg+xml;base64,PHN2ZyBiYXNlUHJvZmlsZT0idGlueSIgdmVyc2lvbj0iMS4yIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgICAgICAgICAgICAgICB3aWR0aD0iMjgwIiBoZWlnaHQ9IjYwIj4KICAgICAgICAgICAgICAgIDx0ZXh0IHg9IjAiIHk9IjUwIiBzdHlsZT0iZm9udDogYm9sZCA2MHB4IHNhbnMtc2VyaWY7IGZpbGw6ICNmZWZlZmU7Ij4xOTc2NDI4NTwvdGV4dD4KICAgICAgICAgICAgPC9zdmc+") white; } .b { user-select: none; color: #fefefe; background: white; border: 5px solid #fefefe; position: fixed; left: 50%; right: 50%; width: 300px; margin-left: -150px; text-align: center; z-index: 1; padding: 0em; font: bold 60px sans-serif; } .d { position: relative; z-index: 2; } .h { user-select: none; color: #fefefe; background: white; position: absolute; transform-origin: top left; transform: rotate(90deg); font: bold 50px sans-serif; } .m { position: absolute; left: 10000px; color: white; color: #ffffff00; font-size: 1px; z-index: -1; } </style><script> window.onload = function() { const colours = ["#181800","#181800","#000018","#001800","#180000","#001800","#001800","#181800","#001800","#180000","#001800","#000018","#000018","#180000","#180000","#000018","#001800","#001800"]; let i = 0; for(const element of document.getElementsByClassName('l')) { if(window.getComputedStyle(element)['color'] === 'rgb(0, 0, 0)') { element.style.color = colours[i]; i = (i + 1) % colours.length; } } }; </script></head>
+            <body> <div> <div class="b" style="top: 10px;" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div> <div class="b" style="bottom: 10px;" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div> </div> <div class="d"> <p style="color: red; text-align: center;"><span class="l">Please</span> do  <span class="l">not</span>    <span class="l">share</span>   <span class="l">this</span>   <span class="l">file</span>  <span class="l">with</span>  <span class="l">other</span>   <span class="l">people</span>.  It <span class="l">has</span>  <span class="l">been</span>    <span class="l">fingerprinted</span>   <span class="l">with</span>   <span class="l">your</span>  ID  (<span class="l">19764285</span>).<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+                <div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h1>Assignment   1</h1>
+                <div class="admonition preamble">
+<p><strong><span class="l">Software</span>  <span class="l">Engineering</span> <span class="l">Concepts</span>  (<span class="l">COMP3003</span>),
+<br>
+<span class="l">Software</span>    <span class="l">Architecture</span>   <span class="l">and</span>   <span class="l">Extensible</span>  <span class="l">Design</span>  (<span class="l">COMP6007</span>)</strong>
+<br>
+<span class="l">Semester</span>   2,  <span class="l">2021</span><span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><strong><span class="l">Due</span>:</strong> <span class="l">Thursday</span>  16    <span class="l">September</span>,   23:59
+<br>
+<strong><span class="l">Weight</span>:</strong>   40%  of  <span class="l">the</span>   <span class="l">unit</span>  <span class="l">mark</span><span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+</div>
+<p><span class="l">This</span> <span class="l">assignment</span>  <span class="l">will</span>    <span class="l">cover</span>   <span class="l">architecture</span>   <span class="l">and</span>  <span class="l">multithreading</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h2>Overview</h2>
+<p><span class="l">Your</span>  <span class="l">task</span>   is  to <span class="l">design</span>  <span class="l">and</span>    <span class="l">implement</span>   <span class="l">the</span>   <span class="l">system</span>  <span class="l">described</span>  in   <span class="l">the</span>  <a href="#problem_description"><span class="l">Problem</span> <span class="l">Description</span></a>  <span class="l">section</span>    in   a   <span class="l">multithreaded</span>  <span class="l">fashion</span>,  <span class="l">and</span>   <span class="l">prepare</span>  a <span class="l">report</span>  as    <span class="l">described</span>   <span class="l">below</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">The</span>   <span class="l">assignment</span>  <span class="l">will</span>  be   <span class="l">marked</span>  <span class="l">out</span> of  40.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h3>Language</h3>
+<p>It&rsquo;s    <span class="l">recommended</span>   <span class="l">that</span>   <span class="l">you</span>  <span class="l">use</span>  <span class="l">Java</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">You</span>   <span class="l">may</span>  <span class="l">alternatively</span> <span class="l">use</span>  <span class="l">other</span>    <span class="l">typically</span>-<span class="l">JVM</span>-<span class="l">based</span>   <span class="l">languages</span>   (e.g.,  <span class="l">Kotlin</span>,  <span class="l">Scala</span>   or  <span class="l">Groovy</span>), or  C#    <span class="l">without</span>   <span class="l">seeking</span>   <span class="l">permission</span>.  <span class="l">But</span>  be   <span class="l">aware</span>  <span class="l">that</span> <span class="l">these</span>  <span class="l">languages</span>    <span class="l">are</span>   <span class="l">harder</span>   to  <span class="l">find</span>  <span class="l">help</span>   <span class="l">for</span>  <span class="l">among</span> <span class="l">teaching</span>  <span class="l">staff</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>(If    <span class="l">you</span>   do   <span class="l">wish</span>  to  <span class="l">use</span>   a  <span class="l">language</span> <span class="l">beyond</span>  <span class="l">those</span>    <span class="l">ones</span>,   <span class="l">you</span>   <span class="l">must</span>  <span class="l">obtain</span>  <span class="l">written</span>   <span class="l">permission</span>  <span class="l">first</span>, <span class="l">and</span>  <span class="l">you</span>    <span class="l">must</span>   <span class="l">convince</span>   <span class="l">the</span>  <span class="l">unit</span>  <span class="l">coordinator</span>   <span class="l">that</span>  <span class="l">you</span> <span class="l">will</span>  be    <span class="l">able</span>   to   <span class="l">demonstrate</span>  <span class="l">the</span>  <span class="l">multithreading</span>   <span class="l">concepts</span>  <span class="l">covered</span> in  <span class="l">this</span>    <span class="l">unit</span>   in   <span class="l">your</span>  <span class="l">chosen</span>  <span class="l">language</span>.)<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h3>Design   Goals</h3>
+<p><span class="l">Your</span>  <span class="l">program</span> <span class="l">must</span>  <span class="l">actually</span>    <span class="l">work</span>.   If   it  <span class="l">does</span>  <span class="l">not</span>   <span class="l">implement</span>  <span class="l">all</span> <span class="l">the</span>  <span class="l">functionality</span>    <span class="l">required</span>   in   <span class="l">the</span>  <a href="#problem_description"><span class="l">Problem</span>  <span class="l">Description</span></a>   <span class="l">section</span>,  <span class="l">expect</span> <span class="l">mark</span>  <span class="l">deductions</span>.    It   is   <span class="l">advisable</span>  to  <span class="l">include</span>   a  <code><span class="l">README</span></code> <span class="l">file</span>  <span class="l">that</span>    <span class="l">describes</span>   <span class="l">how</span>   to  <span class="l">compile</span>  <span class="l">and</span>   <span class="l">run</span>  <span class="l">the</span> <span class="l">program</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">That</span>  <span class="l">said</span>,    <span class="l">the</span>   <span class="l">goal</span>   is  <span class="l">really</span>  to   <span class="l">demonstrate</span>  <span class="l">multithreading</span> <span class="l">concepts</span>  <span class="l">from</span>    <span class="l">the</span>   <span class="l">unit</span>.   <span class="l">You</span>  <span class="l">must</span>  <span class="l">use</span>   <span class="l">multithreading</span>,  <span class="l">and</span> do  so    in   a   <span class="l">sensible</span>  <span class="l">fashion</span>:  <span class="l">make</span>   <span class="l">efficient</span>  <span class="l">use</span> of  <span class="l">resources</span>    (<span class="l">insofar</span>   as   <span class="l">multithreading</span>  <span class="l">can</span>  <span class="l">help</span>   to  do so),  <span class="l">and</span>    <span class="l">prevent</span>   <span class="l">race</span>   <span class="l">conditions</span>  <span class="l">and</span>  <span class="l">deadlocks</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>In   <span class="l">particular</span>,  <span class="l">you</span> <span class="l">are</span>  <span class="l">required</span>    to   <span class="l">make</span>   <span class="l">use</span>  of  <span class="l">the</span>   <span class="l">following</span>,  <span class="l">for</span> <span class="l">their</span>  <span class="l">intended</span>    <span class="l">purposes</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li>A   <span class="l">blocking</span>   <span class="l">queue</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>A  <span class="l">thread</span>  <span class="l">pool</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li><code><span class="l">InterruptedException</span></code>   (or  <span class="l">its</span> <span class="l">equivalent</span>  in    <span class="l">your</span>   <span class="l">chosen</span>   <span class="l">language</span>).<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<p><span class="l">These</span>  <span class="l">are</span>  <span class="l">likely</span>   <span class="l">not</span>  <span class="l">the</span> <span class="l">only</span>  <span class="l">threading</span>    <span class="l">constructs</span>   <span class="l">you</span>   <span class="l">will</span>  <span class="l">need</span>  to   <span class="l">use</span>,  <span class="l">but</span> <span class="l">the</span>  <span class="l">rest</span>    is   up   to  <span class="l">you</span>  to   <span class="l">determine</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Marks</span>  <span class="l">will</span> be  <span class="l">allocated</span>    as   <span class="l">follows</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ol>
+<li>
+<p><span class="l">Division</span>   of  <span class="l">responsibilities</span>  <strong>[5   <span class="l">marks</span>]</strong>.  <span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Appropriate</span> <span class="l">division</span>  of    <span class="l">responsibilities</span>   <span class="l">among</span>   <span class="l">threads</span>/<span class="l">tasks</span>.  <span class="l">You</span>  <span class="l">haven</span>&rsquo;t   <span class="l">missed</span>  <span class="l">obvious</span> <span class="l">opportunities</span>  <span class="l">for</span>    <span class="l">multithreading</span>.   <span class="l">You</span>   <span class="l">don</span>&rsquo;t  <span class="l">have</span>  <span class="l">too</span>   <span class="l">many</span>  <span class="l">threads</span> <span class="l">doing</span>  <span class="l">unnecessarily</span>    <span class="l">trivial</span>   <span class="l">tasks</span>.   <span class="l">All</span>  <span class="l">your</span>  <span class="l">threads</span>   <span class="l">and</span>  <span class="l">tasks</span> <span class="l">contribute</span>  <span class="l">towards</span>    <span class="l">solving</span>   <span class="l">the</span>   <span class="l">problem</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Blocking</span>  <span class="l">queue</span>(s)  <strong>[5   <span class="l">marks</span>]</strong>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Appropriate</span>  <span class="l">use</span> of  a    <span class="l">blocking</span>   <span class="l">queue</span>   <span class="l">and</span>  <span class="l">other</span>  <span class="l">thread</span>   <span class="l">communication</span>  <span class="l">mechanisms</span> as  <span class="l">needed</span>.    <span class="l">The</span>   <span class="l">blocking</span>   <span class="l">queue</span>  in  <span class="l">particular</span>   <span class="l">must</span>  be an  <span class="l">actual</span>    <span class="l">part</span>   of   <span class="l">the</span>  <span class="l">solution</span>  (<span class="l">not</span>   <span class="l">just</span>  <span class="l">something</span> <span class="l">added</span>  on).<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Thread</span>    <span class="l">pool</span>(s)   <strong>[5   <span class="l">marks</span>]</strong>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Appropriate</span>  <span class="l">use</span>  of   a  <span class="l">thread</span> <span class="l">pool</span>  <span class="l">and</span>    <span class="l">other</span>   <span class="l">thread</span>-<span class="l">creation</span>   <span class="l">logic</span>  (<span class="l">with</span>  <span class="l">same</span>   <span class="l">proviso</span>  as <span class="l">above</span>).  In    <span class="l">particular</span>,   it   is  <em><span class="l">fundamentally</span>  <span class="l">not</span>   <span class="l">useful</span></em>  to <span class="l">have</span>  a    <span class="l">thread</span>   <span class="l">pool</span>   <span class="l">that</span>  <span class="l">only</span>  <span class="l">ever</span>   <span class="l">executes</span>  <span class="l">one</span> <span class="l">task</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Other</span>  <span class="l">threading</span>    <span class="l">constructs</span>   as   <span class="l">needed</span>  <strong>[5  <span class="l">marks</span>]</strong>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Appropriate</span>   <span class="l">use</span>  of <code><span class="l">InterruptedException</span></code>  in    <span class="l">particular</span>,   <span class="l">and</span>   <span class="l">other</span>  <span class="l">mechanisms</span>  in   <span class="l">general</span>  to <span class="l">prevent</span>  <span class="l">race</span>    <span class="l">conditions</span>   <span class="l">and</span>   <span class="l">deadlocks</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">General</span>  <span class="l">code</span>  <span class="l">quality</span>   <strong>[5  <span class="l">marks</span>]</strong>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Make</span> <span class="l">good</span>  <span class="l">use</span>    of   <span class="l">encapsulation</span>,   <span class="l">particularly</span>  as  <span class="l">described</span>   in  <span class="l">this</span> <span class="l">unit</span>.  <span class="l">Separate</span>    <span class="l">out</span>   <span class="l">your</span>   <span class="l">design</span>  <span class="l">into</span>  a   <span class="l">series</span>  of <span class="l">classes</span>  <span class="l">that</span>    <span class="l">each</span>   <span class="l">have</span>   a  <span class="l">well</span>-<span class="l">defined</span>  <span class="l">purpose</span>,   <span class="l">and</span>  <span class="l">are</span> <span class="l">not</span>  <span class="l">too</span>    <span class="l">tightly</span>   <span class="l">coupled</span>.   <span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Maximise</span>  <span class="l">readability</span>:  <span class="l">have</span>   <span class="l">good</span>  <span class="l">commenting</span>, <span class="l">proper</span>  <span class="l">formatting</span>,    <span class="l">meaningful</span>   <span class="l">names</span>,   <span class="l">etc</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ol>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h3>Report</h3>
+<p><span class="l">Prepare</span>  a  <span class="l">report</span>   (3  <span class="l">pages</span> or  <span class="l">more</span>)    <span class="l">that</span>   <span class="l">contains</span>   <span class="l">the</span>  <span class="l">following</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ol>
+<li>
+<p>An  <span class="l">explanation</span>   of  <span class="l">your</span> <span class="l">design</span>  in    <span class="l">regards</span>   to   <span class="l">multithreading</span>  <strong>[5  <span class="l">marks</span>]</strong>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>In   <span class="l">particular</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li><span class="l">Which</span>  <span class="l">classes</span> <span class="l">are</span>  <span class="l">responsible</span>    <span class="l">for</span>   <span class="l">starting</span>   <span class="l">threads</span>,  <span class="l">and</span>  <span class="l">what</span>   <span class="l">are</span>  <span class="l">these</span> <span class="l">threads</span>  <span class="l">used</span>    <span class="l">for</span>?   <span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li><span class="l">How</span>   do  <span class="l">the</span>  <span class="l">threads</span>   <span class="l">communicate</span>?<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li><span class="l">How</span>  do <span class="l">the</span>  <span class="l">threads</span>    <span class="l">share</span>   <span class="l">resources</span>   (if  <span class="l">they</span>  do   at  <span class="l">all</span>) <span class="l">without</span>  <span class="l">incurring</span>    <span class="l">race</span>   <span class="l">conditions</span>   or  <span class="l">deadlocks</span>?<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li><span class="l">How</span>  do   <span class="l">the</span>  <span class="l">threads</span> <span class="l">end</span>?<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<p><span class="l">Your</span>  <span class="l">discussion</span>    <span class="l">must</span>   <span class="l">reflect</span>   <span class="l">your</span>  <span class="l">own</span>  <span class="l">specific</span>   <span class="l">design</span>.  <span class="l">There</span> <span class="l">are</span>  no    <span class="l">marks</span>   <span class="l">here</span>   <span class="l">for</span>  <span class="l">simply</span>  <span class="l">describing</span>   <span class="l">how</span>  <span class="l">threads</span> <span class="l">and</span>  <span class="l">threading</span>    <span class="l">mechanisms</span>   <span class="l">work</span>   in  <span class="l">general</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Consider</span>  <span class="l">the</span>   <span class="l">architectural</span>  <span class="l">issues</span> <span class="l">relating</span>  to    <em><span class="l">scalability</span></em>   <strong>[10   <span class="l">marks</span>]</strong>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">That</span>  is,  <span class="l">what</span>   if  <span class="l">your</span> <span class="l">application</span>  <span class="l">has</span>    to   <span class="l">deal</span>   <span class="l">with</span>  a  <em><span class="l">very</span>   <span class="l">large</span></em>  <span class="l">amount</span> of  <span class="l">input</span>    <span class="l">data</span>?<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ol>
+<li>
+<p><span class="l">What</span>   <span class="l">are</span>   <span class="l">the</span>  <span class="l">kinds</span>  of   <span class="l">non</span>-<span class="l">functional</span>  <span class="l">requirements</span> we  <span class="l">might</span>    <span class="l">care</span>   <span class="l">about</span>?   <span class="l">And</span>  <span class="l">what</span>  <span class="l">problems</span>   <span class="l">would</span>  a <span class="l">very</span>  <span class="l">large</span>    <span class="l">amount</span>   of   <span class="l">input</span>  <span class="l">data</span>  <span class="l">create</span>?<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">How</span>   <span class="l">could</span>  <span class="l">you</span> re-<span class="l">engineer</span>  <span class="l">the</span>    <span class="l">application</span>&rsquo;s   <span class="l">architecture</span>   to  <span class="l">address</span>  <span class="l">these</span>   <span class="l">problems</span>?<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ol>
+<p><span class="l">These</span>  <span class="l">points</span> <span class="l">are</span>  <span class="l">both</span>    <span class="l">worth</span>   5   <span class="l">marks</span>  <span class="l">each</span>,  <span class="l">but</span>   <span class="l">there</span>  <span class="l">are</span> <span class="l">links</span>  <span class="l">between</span>    <span class="l">them</span>   in   <span class="l">both</span>  <span class="l">directions</span>.  <span class="l">That</span>   is,  <span class="l">also</span> <span class="l">consider</span>  <span class="l">the</span>    <span class="l">issues</span>   <span class="l">that</span>   <span class="l">may</span>  <span class="l">arise</span>  <span class="l">from</span>   <span class="l">your</span>  <span class="l">own</span> re-<span class="l">engineered</span>  <span class="l">architecture</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Note</span>:    do   <span class="l">not</span>   <span class="l">simply</span>  <span class="l">describe</span>  <span class="l">architecture</span>   in  <span class="l">general</span> <span class="l">terms</span>.  <span class="l">Make</span>    it   <span class="l">specific</span>   to  <span class="l">the</span>  <span class="l">problem</span>   at  <span class="l">hand</span>!<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">For</span> <span class="l">some</span>  <span class="l">additional</span>    <span class="l">context</span>   <span class="l">here</span>,   <span class="l">say</span>  <span class="l">that</span>  <span class="l">your</span>   <span class="l">application</span>  <span class="l">also</span> <span class="l">has</span>  a    <span class="l">large</span>   <span class="l">number</span>   of  <span class="l">users</span>  <span class="l">who</span>   <span class="l">might</span>  be <span class="l">interested</span>  in    <span class="l">running</span>   it   at  <span class="l">various</span>  <span class="l">different</span>   <span class="l">points</span>  in <span class="l">time</span>.  <span class="l">You</span>    <span class="l">may</span>   <span class="l">also</span>   <span class="l">make</span>  <span class="l">other</span>  <span class="l">reasonable</span>   <span class="l">assumptions</span>  <span class="l">about</span> <span class="l">the</span>  <span class="l">situation</span>,    as   <span class="l">long</span>   as  <span class="l">you</span>  <span class="l">state</span>   <span class="l">what</span>  <span class="l">you</span> <span class="l">are</span>  <span class="l">assuming</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h2 id="problem_description">Problem    Description</h2>
+<p><span class="l">This</span>   <span class="l">section</span>   <span class="l">describes</span>  <span class="l">the</span>  <span class="l">required</span>   <span class="l">functionality</span>  of <span class="l">your</span>  <span class="l">application</span>.    It   <span class="l">must</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li>
+<p><span class="l">Present</span>   a  <span class="l">simple</span>  <span class="l">GUI</span>   to  <span class="l">the</span> <span class="l">user</span>  <span class="l">that</span>    <span class="l">initially</span>   <span class="l">asks</span>   <span class="l">for</span>  <span class="l">the</span>  <span class="l">name</span>   of  a <span class="l">directory</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">There</span>  is    a   <span class="l">simple</span>   <span class="l">JavaFX</span>  <span class="l">demo</span>  <span class="l">application</span>   <span class="l">available</span>  on <span class="l">Blackboard</span>  <span class="l">that</span>    <span class="l">you</span>   <span class="l">can</span>   <span class="l">build</span>  on.  <span class="l">You</span>   <span class="l">can</span>  <span class="l">also</span> <span class="l">create</span>  <span class="l">the</span>    <span class="l">GUI</span>   <span class="l">from</span>   <span class="l">scratch</span>  if  <span class="l">you</span>   <span class="l">prefer</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Find</span>  <span class="l">all</span> <span class="l">non</span>-<span class="l">empty</span>  <span class="l">text</span>    <span class="l">files</span>   <span class="l">within</span>   <span class="l">that</span>  <span class="l">directory</span>  <span class="l">tree</span>.   <span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">For</span>  <span class="l">this</span> <span class="l">purpose</span>,  a    &ldquo;<span class="l">text</span>   <span class="l">file</span>&rdquo;   is  <span class="l">any</span>  <span class="l">file</span>   <span class="l">ending</span>  in .<span class="l">txt</span>,  .md,    .<span class="l">java</span>,   .cs,   or  (if  <span class="l">you</span>   <span class="l">like</span>)  <span class="l">other</span> <span class="l">extensions</span>  <span class="l">too</span>.    <span class="l">You</span>   <span class="l">can</span>   <span class="l">optionally</span>  <span class="l">make</span>  it   <span class="l">user</span>-<span class="l">configurable</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>A  <span class="l">non</span>-<span class="l">empty</span> <span class="l">file</span>  is    <span class="l">just</span>   <span class="l">one</span>   <span class="l">whose</span>  <span class="l">size</span>  is   &gt;  0.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Compare</span> <span class="l">each</span>  <span class="l">text</span>    <span class="l">file</span>   to   <em><span class="l">every</span>  <span class="l">other</span></em>  <span class="l">text</span>   <span class="l">file</span>  (<span class="l">including</span> <span class="l">those</span>  <span class="l">with</span>    <span class="l">different</span>   <span class="l">extensions</span>).   A  <span class="l">comparison</span>  <span class="l">between</span>   <span class="l">two</span>  <span class="l">text</span> <span class="l">files</span>  <span class="l">must</span>    <span class="l">find</span>   <span class="l">the</span>   &ldquo;<span class="l">similarity</span>  <span class="l">score</span>&rdquo;  of   <span class="l">their</span>  <span class="l">contents</span>, <span class="l">expressed</span>  as    a   <span class="l">single</span>   <span class="l">real</span>  <span class="l">number</span>  <span class="l">from</span>   0&ndash;1.  <span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">The</span> <span class="l">comparison</span>  <span class="l">algorithm</span>    <span class="l">itself</span>   is   <span class="l">discussed</span>  <span class="l">below</span>  in   <span class="l">detail</span>,  <span class="l">but</span> <span class="l">note</span>  <span class="l">that</span>    it   is   &ldquo;<span class="l">symmetric</span>&rdquo;,  <span class="l">and</span>  <span class="l">you</span>   <span class="l">should</span>  <span class="l">avoid</span> <span class="l">doing</span>  <span class="l">redundant</span>    <span class="l">comparisons</span>.   <span class="l">Comparing</span>   <span class="l">file</span>  A  to   <span class="l">file</span>  B is  <span class="l">the</span>    <span class="l">same</span>   as   <span class="l">comparing</span>  <span class="l">file</span>  B   to  <span class="l">file</span> A.  <span class="l">You</span>    <span class="l">should</span>   <span class="l">avoid</span>   <span class="l">doing</span>  <span class="l">both</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Even</span>  so,   <span class="l">for</span>  a <span class="l">large</span>  <span class="l">number</span>    of   <span class="l">files</span>,   <span class="l">there</span>  <span class="l">will</span>  be   a  <em><span class="l">very</span></em> <span class="l">large</span>  <span class="l">number</span>    of   <span class="l">comparisons</span>.   <span class="l">Say</span>  <math><mi>f</mi></math>  is   <span class="l">the</span>  <span class="l">number</span> of  <span class="l">files</span>,    <span class="l">and</span>   <math><mi>c</mi></math>   is  <span class="l">the</span>  <span class="l">number</span>   of  <span class="l">comparisons</span>. <span class="l">Then</span>,  
+<math>
+    <mrow>
+   <mi>c</mi>   
+  <mo>=</mo>  
+   <mn>0.5</mn>  
+ <mo>&times;</mo>
+  (
+    <msup><mi>f</mi><mn>2</mn></msup>   
+   <mo>&minus;</mo>
+  <mi>f</mi>
+  )
+   </mrow>
+</math>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">For</span>  2 <span class="l">files</span>  (<math><mrow><mi>f</mi><mo>=</mo><mn>2</mn></mrow></math>),    <span class="l">there</span>   is   <span class="l">only</span>  1  <span class="l">comparison</span>   (<math><mrow><mi>c</mi><mo>=</mo><mn>1</mn></mrow></math>).  <span class="l">For</span> 3,  <span class="l">there</span>    <span class="l">are</span>   3   <span class="l">comparisons</span>;  <span class="l">for</span>  4   <span class="l">there</span>  <span class="l">are</span> 6  <span class="l">comparisons</span>.    
+<span class="l">For</span>   <math><mrow><mi>f</mi><mo>=</mo><mn>10</mn></mrow></math>,   
+  <math><mrow><mi>c</mi><mo>=</mo><mn>45</mn></mrow></math>.  
+<span class="l">For</span>   <math><mrow><mi>f</mi><mo>=</mo><mn><span class="l">100</span></mn></mrow></math>,  
+ <math><mrow><mi>c</mi><mo>=</mo><mn><span class="l">4950</span></mn></mrow></math>.  
+<span class="l">For</span>    <math><mrow><mi>f</mi><mo>=</mo><mn><span class="l">1000</span></mn></mrow></math>,   
+   <math><mrow><mi>c</mi><mo>=</mo><mn><span class="l">499</span>  <span class="l">500</span></mn></mrow></math>.  
+<span class="l">For</span>   <math><mrow><mi>f</mi><mo>=</mo><mn>1  <span class="l">000</span> <span class="l">000</span></mn></mrow></math>,  
+    <math><mrow><mi>c</mi><mo>=</mo><mn><span class="l">499</span>   <span class="l">999</span>   <span class="l">500</span>  <span class="l">000</span></mn></mrow></math>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Allow</span>  <span class="l">the</span>   <span class="l">user</span>  to <span class="l">stop</span>  a    <span class="l">series</span>   of   <span class="l">comparisons</span>  at  <span class="l">any</span>   <span class="l">point</span>,  by <span class="l">pressing</span>  a    &ldquo;<span class="l">Stop</span>&rdquo;   <span class="l">button</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">For</span>   <span class="l">each</span>  <span class="l">completed</span>  <span class="l">comparison</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li>
+<p><span class="l">Record</span>   it  in a  <span class="l">CSV</span>    <span class="l">called</span>   <code><span class="l">results</span>.<span class="l">csv</span></code>   (or  <span class="l">some</span>  <span class="l">user</span>-<span class="l">configurable</span>   <span class="l">name</span>),  <span class="l">where</span> <span class="l">the</span>  <span class="l">first</span>    <span class="l">two</span>   <span class="l">fields</span>/<span class="l">columns</span>   <span class="l">are</span>  <span class="l">the</span>  <span class="l">filenames</span>,   <span class="l">and</span>  <span class="l">the</span> <span class="l">third</span>  <span class="l">field</span>/<span class="l">column</span>    is   <span class="l">their</span>   <span class="l">similarity</span>  <span class="l">score</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Update</span>  an   on-<span class="l">screen</span>  <span class="l">GUI</span> <span class="l">progress</span>  <span class="l">bar</span>.    <span class="l">This</span>   <span class="l">must</span>   <span class="l">actually</span>  <span class="l">indicate</span>  <span class="l">the</span>   <span class="l">progress</span>  of <span class="l">the</span>  <span class="l">comparisons</span>;    i.e.,   <span class="l">when</span>   X%  of  <span class="l">the</span>   <span class="l">comparisons</span>  <span class="l">are</span> <span class="l">complete</span>,  <span class="l">the</span>    <span class="l">progress</span>   <span class="l">bar</span>   <span class="l">must</span>  <span class="l">indicate</span>  X%   <span class="l">progress</span>  (<span class="l">for</span> <span class="l">all</span>  <span class="l">values</span>    of   X).<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p>If   <span class="l">the</span>  <span class="l">similarity</span>  &gt;   0.5,  <span class="l">add</span> it  to    an   on-<span class="l">screen</span>   <span class="l">list</span>  of  <span class="l">high</span>-<span class="l">similarity</span>   <span class="l">comparisons</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>(<span class="l">You</span>  <span class="l">can</span> <span class="l">replace</span>  <span class="l">the</span>    0.5   <span class="l">threshold</span>   <span class="l">with</span>  a  <span class="l">user</span>-<span class="l">configurable</span>   <span class="l">value</span>  <span class="l">between</span> 0  <span class="l">and</span>    1   if   <span class="l">you</span>  <span class="l">like</span>.)<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title"><span class="l">Hint</span><span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><em><span class="l">Reading</span></em>  <span class="l">and</span>   <em><span class="l">writing</span></em>  <span class="l">files</span> is  IO-<span class="l">intensive</span>,    <span class="l">whereas</span>   <em><span class="l">comparing</span></em>   <span class="l">their</span>  <span class="l">contents</span>  (<span class="l">after</span>   <span class="l">being</span>  <span class="l">read</span>) is  <span class="l">CPU</span>-<span class="l">intensive</span>.    <span class="l">Consider</span>   <span class="l">this</span>   in  <span class="l">your</span>  <span class="l">multithreading</span>   <span class="l">design</span>!<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+</div>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h3>Comparison  Algorithm</h3>
+<p><span class="l">For</span> <span class="l">each</span>  <span class="l">file</span>-to-<span class="l">file</span>    <span class="l">comparison</span>,   <span class="l">compute</span>   <span class="l">the</span>  <span class="l">longest</span>-<span class="l">common</span>-<span class="l">subsequence</span>  (<span class="l">LCS</span>)   on  a <span class="l">character</span>-by-<span class="l">character</span>  <span class="l">basis</span>.    <span class="l">That</span>   is,   we  <span class="l">want</span>  to   <span class="l">find</span>  <span class="l">the</span> <span class="l">longest</span>  <span class="l">sequence</span>    of   <span class="l">characters</span>   <span class="l">that</span>  <span class="l">occurs</span>  in   <span class="l">both</span>  <span class="l">files</span>, in  <span class="l">the</span>    <span class="l">same</span>   <span class="l">order</span>,   <span class="l">with</span>  <span class="l">gaps</span>  <span class="l">allowed</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">You</span>   <span class="l">should</span>  be <span class="l">able</span>  to    <span class="l">determine</span>   <span class="l">how</span>   to  <span class="l">read</span>  <span class="l">individual</span>   <span class="l">file</span>  <span class="l">characters</span>, <span class="l">but</span>  <span class="l">the</span>    <span class="l">LCS</span>   <span class="l">algorithm</span>   is  a  <span class="l">little</span>   <span class="l">complex</span>.  <span class="l">Here</span>&rsquo;s a  <span class="l">version</span>    of   <span class="l">the</span>   <span class="l">classic</span>  &ldquo;<span class="l">dynamic</span>  <span class="l">programming</span>&rdquo;   <span class="l">solution</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<div class="admonition lcs">
+<p class="admonition-title"><span class="l">LCS</span>  <span class="l">Dynamic</span> <span class="l">Programming</span>  <span class="l">Algorithm</span><span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<div class="highlight"><pre><span></span><code><span class="l">double</span> <span class="l">calcSimilarity</span>(<span class="l">file1</span>: <span class="l">array</span> of <span class="l">chars</span>, <span class="l">file2</span>: <span class="l">array</span> of <span class="l">chars</span>)
+
+    <span class="l">subsolutions</span> =  2D <span class="l">array</span> of <span class="l">integers</span>, <span class="l">size</span> (<span class="l">file1</span>.<span class="l">length</span> + 1) x (<span class="l">file2</span>.<span class="l">length</span> + 1)
+    <span class="l">directionLeft</span> = 2D <span class="l">array</span> of <span class="l">booleans</span>, <span class="l">size</span> (<span class="l">file1</span>.<span class="l">length</span> + 1) x (<span class="l">file2</span>.<span class="l">length</span> + 1)
+    <span class="l">fill</span> <span class="l">first</span> <span class="l">row</span> <span class="l">and</span> <span class="l">first</span> <span class="l">column</span> of <span class="l">subsolutions</span> <span class="l">with</span> <span class="l">zeros</span>
+
+    <span class="l">for</span> i := 1 to <span class="l">file1</span>.<span class="l">length</span> (<span class="l">inclusive</span>)    
+        <span class="l">for</span> j := 1 to <span class="l">file2</span>.<span class="l">length</span> (<span class="l">inclusive</span>)
+
+            if <span class="l">file1</span>[i - 1] == <span class="l">file2</span>[j - 1]
+                <span class="l">subsolutions</span>[i][j] = <span class="l">subsolutions</span>[i - 1][j - 1] + 1
+
+            <span class="l">else</span> if <span class="l">subsolutions</span>[i - 1][j] &gt; <span class="l">subsolutions</span>[i][j - 1]
+                <span class="l">subsolutions</span>[i][j] = <span class="l">subsolutions</span>[i - 1][j]
+                <span class="l">directionsLeft</span>[i][j] = <span class="l">true</span>
+
+            <span class="l">else</span>
+                <span class="l">subsolutions</span>[i][j] = <span class="l">subsolutions</span>[i][j - 1]
+                <span class="l">directionLeft</span>[i][j] = <span class="l">false</span>
+
+            <span class="l">end</span>-if            
+        <span class="l">end</span>-<span class="l">for</span>
+    <span class="l">end</span>-<span class="l">for</span>
+
+    <span class="l">matches</span> = 0
+    i = <span class="l">file1</span>.<span class="l">length</span>
+    j = <span class="l">file2</span>.<span class="l">length</span>
+
+    <span class="l">while</span> i &gt; 0 <span class="l">and</span> j &gt; 0    
+        if <span class="l">file1</span>[i - 1] == <span class="l">file2</span>[j - 1]
+            <span class="l">matches</span> += 1
+            i -= 1
+            j -= 1
+
+        <span class="l">else</span> if <span class="l">directionLeft</span>[i][j]        
+            i -= 1
+
+        <span class="l">else</span>        
+            j -= 1
+
+        <span class="l">end</span>-if
+    <span class="l">end</span>-<span class="l">while</span>
+
+    <span class="l">return</span> (<span class="l">matches</span> * 2) / (<span class="l">file1</span>.<span class="l">length</span> + <span class="l">file2</span>.<span class="l">length</span>)
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title"><span class="l">Note</span><span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>&ldquo;<code><span class="l">matches</span></code>&rdquo;    is   <span class="l">the</span>   <span class="l">length</span>  of  <span class="l">the</span>   <span class="l">longest</span>-<span class="l">common</span>-<span class="l">subsequence</span>.  <span class="l">This</span> is  <span class="l">then</span>    <span class="l">used</span>   to   <span class="l">calculate</span>  a  &ldquo;<span class="l">similarity</span>&rdquo;   <span class="l">value</span>  <span class="l">between</span> 0  <span class="l">and</span>    1.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><span class="l">Note</span><span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">There</span>   <span class="l">are</span>   <span class="l">more</span>  <span class="l">efficient</span>  <span class="l">algorithms</span>   <span class="l">than</span>  <span class="l">this</span>, <span class="l">and</span>  <span class="l">even</span>    <span class="l">tweaks</span>   to   <span class="l">this</span>  <span class="l">algorithm</span>  <span class="l">that</span>   <span class="l">could</span>  <span class="l">make</span> it  <span class="l">less</span>    <span class="l">wasteful</span>.   <span class="l">You</span>   <span class="l">can</span>  <span class="l">try</span>  to   <span class="l">implement</span>  a <span class="l">better</span>  <span class="l">solution</span>    if   <span class="l">you</span>   <span class="l">want</span>,  <span class="l">but</span>  <span class="l">algorithm</span>   <span class="l">design</span>  <span class="l">isn</span>&rsquo;t <span class="l">really</span>  <span class="l">the</span>    <span class="l">aim</span>   of   <span class="l">the</span>  <span class="l">assignment</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+</div>
+</div>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h3>Testing</h3>
+<p><span class="l">Obviously</span>  <span class="l">you</span>   <span class="l">will</span>  <span class="l">want</span> to  <span class="l">test</span>    <span class="l">your</span>   <span class="l">code</span>.   <span class="l">You</span>&rsquo;re  <span class="l">not</span>  <span class="l">required</span>   to  <span class="l">write</span> <span class="l">anything</span>  <span class="l">about</span>    <span class="l">your</span>   <span class="l">testing</span>   <span class="l">process</span>,  <span class="l">nor</span>  <span class="l">submit</span>   <span class="l">your</span>  <span class="l">test</span> <span class="l">data</span>,  <span class="l">but</span>    <span class="l">you</span>   <span class="l">will</span>   <span class="l">need</span>  to  do   <span class="l">testing</span>  or <span class="l">risk</span>  <span class="l">submitting</span>    a   <span class="l">non</span>-<span class="l">working</span>   <span class="l">program</span>!  <span class="l">This</span>  <span class="l">section</span>   <span class="l">just</span>  <span class="l">contains</span> <span class="l">some</span>  <span class="l">advice</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li>
+<p><span class="l">Start</span>    <span class="l">with</span>   a   <span class="l">test</span>  <span class="l">directory</span>  <span class="l">containing</span>   <span class="l">just</span>  <span class="l">two</span> <span class="l">files</span>,  to    <span class="l">see</span>   if   <span class="l">one</span>  <span class="l">comparison</span>  <span class="l">works</span>.   <span class="l">However</span>,  <span class="l">you</span> <span class="l">will</span>  <span class="l">eventually</span>    <span class="l">need</span>   to   <span class="l">test</span>  <span class="l">with</span>  <span class="l">enough</span>   <span class="l">files</span>  (e.g., <span class="l">hundreds</span>)  so    <span class="l">that</span>   <span class="l">the</span>   <span class="l">whole</span>  <span class="l">process</span>  <span class="l">takes</span>   a  <span class="l">noticeable</span> <span class="l">amount</span>  of    <span class="l">time</span>   to   <span class="l">complete</span>,  <span class="l">for</span>  <span class="l">several</span>   <span class="l">reasons</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li>
+<p><span class="l">You</span>  <span class="l">need</span> to  <span class="l">see</span>    if   <span class="l">the</span>   <span class="l">right</span>  <span class="l">number</span>  of   <span class="l">comparisons</span>  <span class="l">are</span> <span class="l">performed</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">You</span>  <span class="l">need</span>    to   <span class="l">test</span>   <span class="l">whether</span>  <span class="l">your</span>  &ldquo;<span class="l">Stop</span>&rdquo;   <span class="l">button</span>  <span class="l">truly</span> <span class="l">works</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">You</span>  <span class="l">can</span>    <span class="l">check</span>   <span class="l">whether</span>   <span class="l">multiple</span>  <span class="l">threads</span>  do   <span class="l">actually</span>  <span class="l">produce</span> <span class="l">the</span>  <span class="l">expected</span>    <span class="l">speed</span>-up,   <span class="l">compared</span>   to  <span class="l">having</span>  a   <span class="l">single</span>  <span class="l">thread</span> do  <span class="l">all</span>    <span class="l">the</span>   <span class="l">work</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">Race</span>   <span class="l">conditions</span>  <span class="l">lead</span>  to   <span class="l">changing</span>/<span class="l">unpredictable</span>  <span class="l">results</span>, so  <span class="l">you</span>    <span class="l">may</span>   <span class="l">consider</span>   <span class="l">creating</span>  an  <span class="l">automated</span>   <span class="l">test</span>  <span class="l">harness</span> <span class="l">that</span>  <span class="l">performs</span>    <span class="l">the</span>   <span class="l">same</span>   <span class="l">comparison</span>  <span class="l">many</span>  <span class="l">times</span>,   <span class="l">and</span>  <span class="l">checks</span> <span class="l">whether</span>  <span class="l">the</span>    <span class="l">contents</span>   of   <code><span class="l">results</span>.<span class="l">csv</span></code>  is  <span class="l">the</span>   <span class="l">same</span>  <span class="l">each</span> <span class="l">time</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">For</span>  a    <span class="l">given</span>   <span class="l">file</span>-to-<span class="l">file</span>   <span class="l">comparison</span>,  <span class="l">here</span>  <span class="l">are</span>   <span class="l">some</span>  <span class="l">scenarios</span> to  <span class="l">consider</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li>
+<p>If    <span class="l">both</span>   <span class="l">files</span>   <span class="l">are</span>  <span class="l">empty</span>,  <span class="l">the</span>   <span class="l">similarity</span>  <span class="l">score</span> <span class="l">cannot</span>  be    <span class="l">calculated</span>,   <span class="l">because</span>   <span class="l">you</span>  <span class="l">would</span>  <span class="l">have</span>   0  <span class="l">divided</span> by  0.    <span class="l">However</span>,   <span class="l">that</span>   <span class="l">shouldn</span>&rsquo;t  <span class="l">happen</span>  <span class="l">because</span>   <span class="l">only</span>  <span class="l">non</span>-<span class="l">empty</span> <span class="l">files</span>  <span class="l">should</span>    be   <span class="l">compared</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p>If   <span class="l">both</span>  <span class="l">files</span>  <span class="l">contain</span>   <span class="l">completely</span>  <span class="l">different</span> <span class="l">sets</span>  of    <span class="l">characters</span>   (i.e.,   <span class="l">they</span>  <span class="l">have</span>  no   <span class="l">characters</span>  in <span class="l">common</span>  at    <span class="l">all</span>),   <span class="l">the</span>   <span class="l">similarity</span>  <span class="l">score</span>  <span class="l">will</span>   be  0.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">For</span> <span class="l">two</span>  <span class="l">files</span>    <span class="l">containing</span>   <span class="l">1000</span>   <span class="l">random</span>  <span class="l">characters</span>,  <span class="l">the</span>   <span class="l">similarity</span>  <span class="l">score</span> <span class="l">will</span>  be    <span class="l">low</span>,   <span class="l">but</span>   is  <span class="l">very</span>  <span class="l">unlikely</span>   to  be 0.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p><span class="l">For</span>  <span class="l">two</span>    <span class="l">identical</span>   <span class="l">files</span>,   <span class="l">the</span>  <span class="l">similarity</span>  <span class="l">score</span>   <span class="l">will</span>  be 1.  (<span class="l">This</span>    <span class="l">would</span>   <span class="l">also</span>   be  <span class="l">the</span>  <span class="l">result</span>   if  <span class="l">you</span> <span class="l">compared</span>  <span class="l">one</span>    <span class="l">file</span>   to   <span class="l">itself</span>,  <span class="l">though</span>  <span class="l">that</span>   <span class="l">isn</span>&rsquo;t  <span class="l">supposed</span> to  <span class="l">happen</span>.)<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p>If    <span class="l">one</span>   <span class="l">file</span>   <span class="l">contains</span>  <span class="l">exactly</span>  <span class="l">half</span>   of  <span class="l">the</span> <span class="l">other</span>  <span class="l">file</span>    (<span class="l">including</span>   if   <span class="l">the</span>  <span class="l">second</span>  <span class="l">file</span>   is  <span class="l">just</span> <span class="l">two</span>  <span class="l">copies</span>    of   <span class="l">the</span>   <span class="l">first</span>  <span class="l">file</span>  <span class="l">concatenated</span>   <span class="l">together</span>),  <span class="l">then</span> <span class="l">the</span>  <span class="l">similarity</span>    <span class="l">score</span>   <span class="l">will</span>   be  0.<span class="l">66667</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li>
+<p>If  <span class="l">one</span>   <span class="l">file</span>  <span class="l">contains</span> <span class="l">exactly</span>  <span class="l">one</span>    <span class="l">third</span>   of   <span class="l">the</span>  <span class="l">other</span>,  <span class="l">then</span>   <span class="l">the</span>  <span class="l">similarity</span> <span class="l">score</span>  <span class="l">will</span>    be   0.5.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h2>Submission</h2>
+<p><span class="l">Submit</span>   <span class="l">your</span>  <span class="l">code</span>  <span class="l">and</span>   <span class="l">report</span>,  <span class="l">inside</span> a  <span class="l">single</span>    .<span class="l">zip</span>/.<span class="l">tar</span>.gz   <span class="l">file</span>,   to  <span class="l">the</span>  <span class="l">appropriate</span>   <span class="l">area</span>  on <span class="l">Blackboard</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Please</span>:<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<ul>
+<li><span class="l">Don</span>&rsquo;t  <span class="l">use</span>    .<span class="l">rar</span>,   .<span class="l">zipx</span>   or  .7z.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li><span class="l">Don</span>&rsquo;t  <span class="l">have</span>   <span class="l">nested</span>  .<span class="l">zip</span> <span class="l">files</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+<li><em>Do</em>  <span class="l">verify</span>    <span class="l">that</span>   <span class="l">your</span>   <span class="l">submission</span>  is  <span class="l">correct</span>   <span class="l">and</span>  <span class="l">not</span> <span class="l">corrupted</span>.  <span class="l">Once</span>    <span class="l">you</span>   <span class="l">have</span>   <span class="l">submitted</span>,  <span class="l">please</span>  <span class="l">download</span>   <span class="l">your</span>  <span class="l">own</span> <span class="l">submission</span>  <span class="l">and</span>    <span class="l">thoroughly</span>   <span class="l">check</span>   <span class="l">that</span>  it  is   <span class="l">intact</span>.  <span class="l">You</span> <span class="l">may</span>  <span class="l">make</span>    <span class="l">multiple</span>   <span class="l">submissions</span>.   <span class="l">Only</span>  <span class="l">your</span>  <span class="l">last</span>   <span class="l">one</span>  <span class="l">will</span> be  <span class="l">marked</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></li>
+</ul>
+<div><div class="h" aria-hidden="true"><span>&#0049;</span>&#8288;<span>&#0057;</span>&#8288;<span>&#0055;</span>&#8288;<span>&#0054;</span>&#8288;<span>&#0052;</span>&#8288;<span>&#0050;</span>&#8288;<span>&#0056;</span>&#8288;<span>&#0053;</span></div></div><h2>Academic    Integrity</h2>
+<p><span class="l">Please</span>   <span class="l">see</span>   <span class="l">the</span>  <em><span class="l">Coding</span>  <span class="l">and</span>   <span class="l">Academic</span>  <span class="l">Integrity</span> <span class="l">Guidelines</span></em>  on    <span class="l">Blackboard</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p>In   <span class="l">summary</span>,   <span class="l">this</span>  is  an   <span class="l">assessable</span>  <span class="l">task</span>. If  <span class="l">you</span>    <span class="l">use</span>   <span class="l">someone</span>   <span class="l">else</span>&rsquo;s  <span class="l">work</span>  or   <span class="l">assistance</span>  to <span class="l">help</span>  <span class="l">complete</span>    <span class="l">part</span>   of   <span class="l">the</span>  <span class="l">assignment</span>,  <span class="l">where</span>   it&rsquo;s  <span class="l">intended</span> <span class="l">that</span>  <span class="l">you</span>    <span class="l">complete</span>   it   <span class="l">yourself</span>,  <span class="l">you</span>  <span class="l">will</span>   <span class="l">have</span>  <span class="l">compromised</span> <span class="l">the</span>  <span class="l">assessment</span>.    <span class="l">You</span>   <span class="l">will</span>   <span class="l">not</span>  <span class="l">receive</span>  <span class="l">marks</span>   <span class="l">for</span>  <span class="l">any</span> <span class="l">parts</span>  of    <span class="l">your</span>   <span class="l">submission</span>   <span class="l">that</span>  <span class="l">are</span>  <span class="l">not</span>   <span class="l">your</span>  <span class="l">own</span> <span class="l">original</span>  <span class="l">work</span>.    <span class="l">Further</span>,   if   <span class="l">you</span>  do  <span class="l">not</span>   <em><span class="l">reference</span></em>  <span class="l">any</span> <span class="l">external</span>  <span class="l">sources</span>    <span class="l">that</span>   <span class="l">you</span>   <span class="l">use</span>,  <span class="l">you</span>  <span class="l">are</span>   <span class="l">committing</span>  <span class="l">plagiarism</span> <span class="l">and</span>/or  <span class="l">collusion</span>,    <span class="l">and</span>   <span class="l">penalties</span>   <span class="l">for</span>  <span class="l">academic</span>  <span class="l">misconduct</span>   <span class="l">may</span>  <span class="l">apply</span>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">Curtin</span> <span class="l">also</span>  <span class="l">provides</span>    <span class="l">general</span>   <span class="l">advice</span>   on  <span class="l">academic</span>  <span class="l">integrity</span>   at  <a href="http://academicintegrity.curtin.edu.au"><span class="l">academicintegrity</span>.<span class="l">curtin</span>.<span class="l">edu</span>.au</a>.<span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+<p><span class="l">The</span> <span class="l">unit</span>  <span class="l">coordinator</span>    <span class="l">may</span>   <span class="l">require</span>   <span class="l">you</span>  to  <span class="l">provide</span>   an  <span class="l">oral</span> <span class="l">justification</span>  of,    or   to   <span class="l">answer</span>  <span class="l">questions</span>  <span class="l">about</span>,   <span class="l">any</span>  <span class="l">piece</span> of  <span class="l">written</span>    <span class="l">work</span>   <span class="l">submitted</span>   in  <span class="l">this</span>  <span class="l">unit</span>.   <span class="l">Your</span>  <span class="l">response</span>(s) <span class="l">may</span>  be    <span class="l">referred</span>   to   as  <span class="l">evidence</span>  in   an  <span class="l">academic</span> <span class="l">misconduct</span>  <span class="l">inquiry</span>.    <span><span aria-hidden="true" class="m"><span>
+̡̧̢̨̩̦̤̥</span></span></span></p>
+             </div> </body>
+            </html>
