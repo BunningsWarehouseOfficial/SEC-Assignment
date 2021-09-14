@@ -1,4 +1,4 @@
-package java.edu.curtin.krados.comp3003.assignment1;
+package edu.curtin.krados.comp3003.assignment1;
 
 import java.util.*;
 
