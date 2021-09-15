@@ -3,8 +3,8 @@ package edu.curtin.krados.comp3003.assignment1;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,11 +19,9 @@ public class FileFinder implements Runnable
     private FileComparerUI ui;
 
     //TODO: Move elsewhere?
-    private List<String> textFiles = new ArrayList<>();
+    private List<String> textFiles = new LinkedList<>();
     private ExecutorService comparisonService = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors() * 2); //TODO: Change number of threads
-
-    private Object monitor = new Object();
 
     public FileFinder(String searchPath, FileComparerUI ui)
     {
@@ -55,50 +53,9 @@ public class FileFinder implements Runnable
                                 System.out.println("+ add to list: " + fileStr); ///
                                 //TODO: Update progress bar
 
-                                //TODO: Test to make sure these callables don't run until after textFiles is filled
-                                comparisonService.submit(() -> //Submitting comparison callable to thread pool
-                                {
-                                    System.out.println("+ start comparison: " + fileStr); ///
-
-                                    try
-                                    {
-                                        String primaryFile = Files.readString(file);
-
-                                        for (String textFile : textFiles) //FIXME: Need to avoid symmetric comparisons
-                                        {
-                                            if (!fileStr.equals(textFile))
-                                            {
-                                                String secondaryFile = Files.readString(Paths.get(textFile));
-                                                double similarity = calcSimilarity(primaryFile, secondaryFile);
-                                                System.out.println(similarity);
-                                                ComparisonResult newComparison = new ComparisonResult(
-                                                        fileStr, textFile, similarity);
-
-                                                Platform.runLater(() ->
-                                                {
-                                                    ui.addComparison(newComparison);
-                                                });
-                                            }
-                                        }
-                                    }
-                                    catch(IOException e)
-                                    {
-                                        //TODO (perhaps also add inner IOException for secondaryFile)
-                                    }
-
-                                    System.out.println("- finish comparison: " + fileStr); ///
-                                }); //TODO: Perhaps move actual callable code elsewhere?
-
                                 //TODO: Re-calculate numMaxComparisons based on increasing numFiles: c = 0.5 * (f^2 - f) and
                                 //      atomically update synchronized variable accessible by consumer comparison threads
                                 //      OR use textFiles.size() once finished finding all files
-
-                                /// ->
-//                                Platform.runLater(() ->
-//                                {
-//                                    ui.addComparison(new ComparisonResult(fileStr, "test", 0.00));
-//                                });
-                                /// <-
                             }
                         }
                         catch (IOException e)
@@ -111,6 +68,49 @@ public class FileFinder implements Runnable
                 }
             });
             System.out.println("FINISHED WALKING FILE TREE"); ///
+
+            ///now start comparing...
+            String[] comparisonFiles = textFiles.toArray(new String[0]);
+            for (int ii = 0; ii < comparisonFiles.length - 1; ii++)
+            {
+                String comparisonFile = comparisonFiles[ii];
+                int startIndex = ii;
+                comparisonService.submit(() -> //Submitting comparison callable to thread pool
+                {
+                    System.out.println("+ start comparison: " + comparisonFile); ///
+
+                    try
+                    {
+                        String primaryFile = Files.readString(Paths.get(comparisonFile));
+
+                        for (int jj = startIndex + 1; jj < comparisonFiles.length; jj++)
+                        {
+                            String targetFile = comparisonFiles[jj];
+                            if (!comparisonFile.equals(targetFile))
+                            {
+                                String secondaryFile = Files.readString(Paths.get(targetFile));
+
+                                double similarity = calcSimilarity(primaryFile, secondaryFile);
+                                System.out.println(similarity); ///
+                                ComparisonResult newComparison = new ComparisonResult(
+                                        comparisonFile, targetFile, similarity);
+
+                                Platform.runLater(() ->
+                                {
+                                    System.out.println("Running comparison later for s = " + similarity); ///
+                                    ui.addComparison(newComparison);
+                                });
+                            }
+                        }
+                    }
+                    catch(IOException e)
+                    {
+                        //TODO (perhaps also add inner IOException for secondaryFile)
+                    }
+
+                    System.out.println("- finish comparison: " + comparisonFile); ///
+                }); //TODO: Perhaps move actual callable code elsewhere?
+            }
         }
         catch(IOException e)
         {

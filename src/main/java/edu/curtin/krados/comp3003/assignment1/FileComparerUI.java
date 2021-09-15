@@ -120,7 +120,7 @@ public class FileComparerUI extends Application
         //      numMaxComparison and uses them to calculate percent completion and update progressBar
 
         FileFinder finder = new FileFinder(directory.getPath(), this);
-        new Thread(finder, "file-finder-thread").start();
+        new Thread(finder, "file-finder-thread").start(); //TODO: Encapsulate into FileFinder
 
         // Extremely fake way of demonstrating how to use the progress bar (noting that it can 
         // actually only be set to one value, from 0-1, at a time.)
