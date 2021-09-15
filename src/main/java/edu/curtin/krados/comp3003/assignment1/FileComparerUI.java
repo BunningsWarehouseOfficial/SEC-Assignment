@@ -17,7 +17,9 @@ public class FileComparerUI extends Application
     {
         Application.launch(args);
     }
-    
+
+    public static final double MIN_SIMILARITY = 0.5;
+
     private TableView<ComparisonResult> resultTable = new TableView<>();  
     private ProgressBar progressBar = new ProgressBar();
     
@@ -76,9 +78,13 @@ public class FileComparerUI extends Application
         stage.show();
     }
 
-    public void addResult(ComparisonResult newResult)
+    public void addComparison(ComparisonResult newComparison)
     {
-        resultTable.getItems().add(newResult);
+        if (newComparison.getSimilarity() > MIN_SIMILARITY)
+        {
+            resultTable.getItems().add(newComparison);
+        }
+        //TODO: Update progress bar
     }
 
     //Adapted from code provided in Practical 3
@@ -99,7 +105,8 @@ public class FileComparerUI extends Application
         dc.setInitialDirectory(new File("."));
         dc.setTitle("Choose directory");
         File directory = dc.showDialog(stage);
-        
+        //FIXME: ^^ NullPointerException thrown by this if you press cancel in pop up (LOW PRIORITY)
+
         System.out.println("Comparing files within " + directory + "...");
 
         //TODO: Start producer thread(s) to find ALL non empty (size > 0) text files (.txt, .md, .java, .cs)

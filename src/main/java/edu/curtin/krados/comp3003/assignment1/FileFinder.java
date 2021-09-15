@@ -3,7 +3,12 @@ package edu.curtin.krados.comp3003.assignment1;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javafx.application.Platform;
 
 public class FileFinder implements Runnable
@@ -12,6 +17,13 @@ public class FileFinder implements Runnable
 
     private String searchPath;
     private FileComparerUI ui;
+
+    //TODO: Move elsewhere?
+    private List<String> textFiles = new ArrayList<>();
+    private ExecutorService comparisonService = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors() * 2); //TODO: Change number of threads
+
+    private Object monitor = new Object();
 
     public FileFinder(String searchPath, FileComparerUI ui)
     {
@@ -22,6 +34,7 @@ public class FileFinder implements Runnable
     @Override
     public void run()
     {
+        //FIXME: App execution doesn't finish if UI is crossed off if FileFinder has begun
         try
         {
             // Recurse through the directory tree
@@ -38,17 +51,53 @@ public class FileFinder implements Runnable
                             //Check that the file is not empty
                             if (Files.size(file) > 0)
                             {
-                                //TODO: Add to blocking queue to be consumed
-                                //      OR send to thread pool task
+                                textFiles.add(fileStr);
+                                System.out.println("+ add to list: " + fileStr); ///
+                                //TODO: Update progress bar
+
+                                //TODO: Test to make sure these callables don't run until after textFiles is filled
+                                comparisonService.submit(() -> //Submitting comparison callable to thread pool
+                                {
+                                    System.out.println("+ start comparison: " + fileStr); ///
+
+                                    try
+                                    {
+                                        String primaryFile = Files.readString(file);
+
+                                        for (String textFile : textFiles) //FIXME: Need to avoid symmetric comparisons
+                                        {
+                                            if (!fileStr.equals(textFile))
+                                            {
+                                                String secondaryFile = Files.readString(Paths.get(textFile));
+                                                double similarity = calcSimilarity(primaryFile, secondaryFile);
+                                                System.out.println(similarity);
+                                                ComparisonResult newComparison = new ComparisonResult(
+                                                        fileStr, textFile, similarity);
+
+                                                Platform.runLater(() ->
+                                                {
+                                                    ui.addComparison(newComparison);
+                                                });
+                                            }
+                                        }
+                                    }
+                                    catch(IOException e)
+                                    {
+                                        //TODO (perhaps also add inner IOException for secondaryFile)
+                                    }
+
+                                    System.out.println("- finish comparison: " + fileStr); ///
+                                }); //TODO: Perhaps move actual callable code elsewhere?
+
                                 //TODO: Re-calculate numMaxComparisons based on increasing numFiles: c = 0.5 * (f^2 - f) and
                                 //      atomically update synchronized variable accessible by consumer comparison threads
                                 //      OR use textFiles.size() once finished finding all files
 
                                 /// ->
-                                Platform.runLater(() ->
-                                {
-                                    ui.addResult(new ComparisonResult(fileStr, "test", 0.00));
-                                });
+//                                Platform.runLater(() ->
+//                                {
+//                                    ui.addComparison(new ComparisonResult(fileStr, "test", 0.00));
+//                                });
                                 /// <-
                             }
                         }
@@ -61,6 +110,7 @@ public class FileFinder implements Runnable
                     return FileVisitResult.CONTINUE;
                 }
             });
+            System.out.println("FINISHED WALKING FILE TREE"); ///
         }
         catch(IOException e)
         {
@@ -88,7 +138,7 @@ public class FileFinder implements Runnable
             {
                 isTextFile = true;
             }
-            System.out.println(fileExtension); ///
+            //System.out.println(fileExtension); ///
         }
         return isTextFile;
     }
@@ -96,10 +146,10 @@ public class FileFinder implements Runnable
     /**
      * Implementation of the LCS Dynamic Programming Algorithm for determining the similarity between two files.
      */
-    private double calcSimilarity(char[] file1, char[] file2)
+    private double calcSimilarity(String file1, String file2)
     {
-        int rows    = file1.length + 1;
-        int columns = file2.length + 1;
+        int rows    = file1.length() + 1;
+        int columns = file2.length() + 1;
         int[][] subsolutions = new int[rows][columns];
         boolean[][] directionLeft = new boolean[rows][columns];
 
@@ -113,11 +163,11 @@ public class FileFinder implements Runnable
             subsolutions[nn][0] = 0;
         }
 
-        for (int ii = 1; ii <= file1.length; ii++)
+        for (int ii = 1; ii <= file1.length(); ii++)
         {
-            for (int jj = 1; jj <= file2.length; jj++)
+            for (int jj = 1; jj <= file2.length(); jj++)
             {
-                if (file1[ii - 1] == file2[jj - 1])
+                if (file1.charAt(ii - 1) == file2.charAt(jj - 1))
                 {
                     subsolutions[ii][jj] = subsolutions[ii - 1][jj - 1] + 1;
                 }
@@ -135,12 +185,12 @@ public class FileFinder implements Runnable
         }
 
         int matches = 0;
-        int ii = file1.length;
-        int jj = file2.length;
+        int ii = file1.length();
+        int jj = file2.length();
 
         while (ii > 0 && jj > 0)
         {
-            if (file1[ii - 1] == file2[jj - 1])
+            if (file1.charAt(ii - 1) == file2.charAt(jj - 1))
             {
                 matches += 1;
                 ii -= 1;
@@ -155,6 +205,6 @@ public class FileFinder implements Runnable
                 jj -= 1;
             }
         }
-        return (double)(matches * 2) / (double)(file1.length + file2.length);
+        return (double)(matches * 2) / (double)(file1.length() + file2.length());
     }
 }
