@@ -9,7 +9,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.*;
 
 public class FileComparerUI extends Application
 {
@@ -19,6 +18,9 @@ public class FileComparerUI extends Application
     }
 
     public static final double MIN_SIMILARITY = 0.5;
+
+    private int missedFiles;
+    private int numComparisons;
 
     private TableView<ComparisonResult> resultTable = new TableView<>();  
     private ProgressBar progressBar = new ProgressBar();
@@ -78,13 +80,32 @@ public class FileComparerUI extends Application
         stage.show();
     }
 
+    public void addTextFile(String textFile)
+    {
+        System.out.println("Found text file to compare: " + textFile);
+    }
+
+    public void addMissedFile(String textFile, String reason)
+    {
+        System.out.println("Skipped file (" + reason + "): " + textFile);
+        missedFiles++;
+    }
+
     public void addComparison(ComparisonResult newComparison)
     {
         if (newComparison.getSimilarity() > MIN_SIMILARITY)
         {
+            System.out.println("Found two sufficiently similar files: " + newComparison.getString());
             resultTable.getItems().add(newComparison);
         }
-        //TODO: Update progress bar
+    }
+
+    public void incrementProgress(int numMaxComparisons)
+    { //FIXME: Progress bar doesn't fill completely when searching GitHub directory (stuck at 642/780... nope, 675)
+        numComparisons++;
+        double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles); //TODO: Remove -missedFiles if not necessary/helpful
+        progressBar.setProgress(newProgress);
+        System.out.println(newProgress + " = " + numComparisons + " / " + numMaxComparisons); ///
     }
 
     //Adapted from code provided in Practical 3
@@ -99,7 +120,10 @@ public class FileComparerUI extends Application
     
     private void crossCompare(Stage stage)
     {
-        progressBar.setProgress(0.0); //Reset progress bar
+        //Reset progress bar
+        progressBar.setProgress(0.0);
+        numComparisons = 0;
+        missedFiles = 0;
 
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File("."));
@@ -109,22 +133,11 @@ public class FileComparerUI extends Application
 
         System.out.println("Comparing files within " + directory + "...");
 
-        //TODO: Start producer thread(s) to find ALL non empty (size > 0) text files (.txt, .md, .java, .cs)
-
-        //TODO: Create consumer thread pool for comparisons, with thread for each file, but a capped max thread count?
-        //TODO: Update resultTable with .runLater() if similarity > 0.5
         //TODO: Add each ComparisonResult to newResults blocking queue to be consumed/written by a file writer thread
         //      into results.csv
 
-        //TODO: For every discovered file or completed comparison, make .runLater() call that locks numCompared and
-        //      numMaxComparison and uses them to calculate percent completion and update progressBar
-
         FileFinder finder = new FileFinder(directory.getPath(), this);
         new Thread(finder, "file-finder-thread").start(); //TODO: Encapsulate into FileFinder
-
-        // Extremely fake way of demonstrating how to use the progress bar (noting that it can 
-        // actually only be set to one value, from 0-1, at a time.)
-        progressBar.setProgress(1.0);
 
         //TODO: Catch IOException and call (overloaded with exception?) stopComparison() to show error
     }

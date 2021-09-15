@@ -50,35 +50,38 @@ public class FileFinder implements Runnable
                             if (Files.size(file) > 0)
                             {
                                 textFiles.add(fileStr);
-                                System.out.println("+ add to list: " + fileStr); ///
-                                //TODO: Update progress bar
-
-                                //TODO: Re-calculate numMaxComparisons based on increasing numFiles: c = 0.5 * (f^2 - f) and
-                                //      atomically update synchronized variable accessible by consumer comparison threads
-                                //      OR use textFiles.size() once finished finding all files
+                                Platform.runLater(() ->
+                                {
+                                    ui.addTextFile(fileStr);
+                                });
                             }
                         }
                         catch (IOException e)
                         {
                             //Ignore a file whose size couldn't be checked
+                            Platform.runLater(() ->
+                            {
+                                ui.addMissedFile(fileStr, "Couldn't determine file size");
+                            });
                             //TODO: Log to terminal (does it need a .runLater() or something?)
                         }
                     }
                     return FileVisitResult.CONTINUE;
                 }
             });
-            System.out.println("FINISHED WALKING FILE TREE"); ///
 
-            ///now start comparing...
+            int numFiles = textFiles.size();
+            int numMaxComparisons = (numFiles * numFiles - numFiles) / 2;
+            System.out.println("files: " + numFiles + ", maxComparisons = " + numMaxComparisons); ///
+
+            //Start creating threads to compare all the found text files
             String[] comparisonFiles = textFiles.toArray(new String[0]);
             for (int ii = 0; ii < comparisonFiles.length - 1; ii++)
             {
                 String comparisonFile = comparisonFiles[ii];
                 int startIndex = ii;
-                comparisonService.submit(() -> //Submitting comparison callable to thread pool
+                comparisonService.submit(() -> //Submitting comparison callables to thread pool
                 {
-                    System.out.println("+ start comparison: " + comparisonFile); ///
-
                     try
                     {
                         String primaryFile = Files.readString(Paths.get(comparisonFile));
@@ -91,24 +94,22 @@ public class FileFinder implements Runnable
                                 String secondaryFile = Files.readString(Paths.get(targetFile));
 
                                 double similarity = calcSimilarity(primaryFile, secondaryFile);
-                                System.out.println(similarity); ///
                                 ComparisonResult newComparison = new ComparisonResult(
                                         comparisonFile, targetFile, similarity);
 
                                 Platform.runLater(() ->
                                 {
-                                    System.out.println("Running comparison later for s = " + similarity); ///
                                     ui.addComparison(newComparison);
+                                    ui.incrementProgress(numMaxComparisons);
                                 });
                             }
                         }
                     }
                     catch(IOException e)
                     {
+                        System.out.println("===> ERROR: " + e.getMessage()); ///
                         //TODO (perhaps also add inner IOException for secondaryFile)
                     }
-
-                    System.out.println("- finish comparison: " + comparisonFile); ///
                 }); //TODO: Perhaps move actual callable code elsewhere?
             }
         }
@@ -138,7 +139,6 @@ public class FileFinder implements Runnable
             {
                 isTextFile = true;
             }
-            //System.out.println(fileExtension); ///
         }
         return isTextFile;
     }

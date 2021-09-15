@@ -16,4 +16,8 @@ public class ComparisonResult
     public String getFile1() { return file1; }
     public String getFile2() { return file2; }
     public double getSimilarity() { return similarity; }
+    public String getString()
+    {
+        return similarity + ", " + file1 + ", " + file2;
+    }
 }
