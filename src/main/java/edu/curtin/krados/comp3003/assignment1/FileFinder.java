@@ -39,8 +39,10 @@ public class FileFinder implements Runnable
                             if (Files.size(file) > 0)
                             {
                                 //TODO: Add to blocking queue to be consumed
+                                //      OR send to thread pool task
                                 //TODO: Re-calculate numMaxComparisons based on increasing numFiles: c = 0.5 * (f^2 - f) and
                                 //      atomically update synchronized variable accessible by consumer comparison threads
+                                //      OR use textFiles.size() once finished finding all files
 
                                 /// ->
                                 Platform.runLater(() ->
@@ -89,5 +91,70 @@ public class FileFinder implements Runnable
             System.out.println(fileExtension); ///
         }
         return isTextFile;
+    }
+
+    /**
+     * Implementation of the LCS Dynamic Programming Algorithm for determining the similarity between two files.
+     */
+    private double calcSimilarity(char[] file1, char[] file2)
+    {
+        int rows    = file1.length + 1;
+        int columns = file2.length + 1;
+        int[][] subsolutions = new int[rows][columns];
+        boolean[][] directionLeft = new boolean[rows][columns];
+
+        //Fill first row and first column of subsolutions with zeros
+        for (int mm = 0; mm < columns; mm++)
+        {
+            subsolutions[0][mm] = 0;
+        }
+        for (int nn = 0; nn < rows; nn++)
+        {
+            subsolutions[nn][0] = 0;
+        }
+
+        for (int ii = 1; ii <= file1.length; ii++)
+        {
+            for (int jj = 1; jj <= file2.length; jj++)
+            {
+                if (file1[ii - 1] == file2[jj - 1])
+                {
+                    subsolutions[ii][jj] = subsolutions[ii - 1][jj - 1] + 1;
+                }
+                else if (subsolutions[ii - 1][jj] > subsolutions[ii][jj - 1])
+                {
+                    subsolutions[ii][jj] = subsolutions[ii - 1][jj];
+                    directionLeft[ii][jj] = true;
+                }
+                else
+                {
+                    subsolutions[ii][jj] = subsolutions[ii][jj - 1];
+                    directionLeft[ii][jj] = false;
+                }
+            }
+        }
+
+        int matches = 0;
+        int ii = file1.length;
+        int jj = file2.length;
+
+        while (ii > 0 && jj > 0)
+        {
+            if (file1[ii - 1] == file2[jj - 1])
+            {
+                matches += 1;
+                ii -= 1;
+                jj -= 1;
+            }
+            else if (directionLeft[ii][jj])
+            {
+                ii -= 1;
+            }
+            else
+            {
+                jj -= 1;
+            }
+        }
+        return (double)(matches * 2) / (double)(file1.length + file2.length);
     }
 }

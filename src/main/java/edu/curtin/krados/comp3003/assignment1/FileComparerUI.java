@@ -102,7 +102,7 @@ public class FileComparerUI extends Application
         
         System.out.println("Comparing files within " + directory + "...");
 
-        //TODO: Start producer thread(s) to find all non empty (size > 0) text files (.txt, .md, .java, .cs)
+        //TODO: Start producer thread(s) to find ALL non empty (size > 0) text files (.txt, .md, .java, .cs)
 
         //TODO: Create consumer thread pool for comparisons, with thread for each file, but a capped max thread count?
         //TODO: Update resultTable with .runLater() if similarity > 0.5
