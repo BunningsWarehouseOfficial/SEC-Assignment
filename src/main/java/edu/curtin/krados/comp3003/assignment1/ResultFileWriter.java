@@ -24,28 +24,14 @@ public class ResultFileWriter
         thread.start();
     }
 
-//    public void stop()
-//    {
-//        if (thread == null)
-//        {
-//            throw new IllegalArgumentException("Writer thread doesn't exist");
-//        }
-//        thread.interrupt();
-//        thread = null;
-//    }
-
     private void writeResults()
     {
-//        FileOutputStream fileStrm = null;
-//        PrintWriter pw;
         FileWriter fw = null;
         BufferedWriter bw;
         PrintWriter pw;
         try
         {
-//            fileStrm = new FileOutputStream(OUTPUT_FILENAME);
-//            pw = new PrintWriter(fileStrm);
-            fw = new FileWriter(OUTPUT_FILENAME, true);
+            fw = new FileWriter(OUTPUT_FILENAME, false);
             bw = new BufferedWriter(fw);
             pw = new PrintWriter(bw);
 
@@ -57,7 +43,7 @@ public class ResultFileWriter
                     if (result != null)
                     {
                         String newLine = result.getFile1() + "," + result.getFile2() + "," + result.getSimilarity();
-                        System.out.println("WRITING result: " + newLine); ///
+                        System.out.println("> WRITING result"); ///
                         pw.println(newLine);
                     }
                     else

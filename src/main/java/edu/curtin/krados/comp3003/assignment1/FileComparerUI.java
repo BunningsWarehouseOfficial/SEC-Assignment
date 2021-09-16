@@ -19,8 +19,8 @@ public class FileComparerUI extends Application
 
     public static final double MIN_SIMILARITY = 0.5;
 
-    private int missedFiles;
     private int numComparisons;
+    private int missedFiles = 0;
     private FileFinder finder;
     private ResultFileWriter writer;
 
@@ -82,20 +82,13 @@ public class FileComparerUI extends Application
         stage.show();
     }
 
-    public void addTextFile(String textFile)
+    public void displayDetail(String message)
     {
-        System.out.println("Found text file to compare: " + textFile);
-    }
-
-    public void addMissedFile(String textFile, String reason)
-    {
-        System.out.println("Skipped file (" + reason + "): " + textFile);
-        missedFiles++;
+        System.out.println(message);
     }
 
     public void addComparison(ComparisonResult newComparison)
     {
-        System.out.println("+ comparison"); ///
         if (newComparison.getSimilarity() > MIN_SIMILARITY)
         {
             System.out.println("Found two sufficiently similar files: " + newComparison.getString());
@@ -103,12 +96,16 @@ public class FileComparerUI extends Application
         }
     }
 
+    public void addMissedComparison(String missedFile, int numMaxComparisons)
+    {
+        missedFiles++;
+        updateProgressBar(progressBar, numMaxComparisons);
+    }
+
     public void incrementProgress(int numMaxComparisons)
     { //FIXME: Progress bar doesn't fill completely when searching GitHub directory (stuck at 642/780... nope, 675)
         numComparisons++;
-        double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles); //TODO: Remove -missedFiles if not necessary/helpful
-        progressBar.setProgress(newProgress);
-        //System.out.println(newProgress + " = " + numComparisons + " / " + numMaxComparisons); ///
+        updateProgressBar(progressBar, numMaxComparisons);
     }
 
     //Adapted from code provided in Practical 3
@@ -134,10 +131,10 @@ public class FileComparerUI extends Application
 
         System.out.println("Comparing files within " + directory + "...");
 
-        FileFinder finder = new FileFinder(directory.getPath(), this);
+        finder = new FileFinder(directory.getPath(), this);
         finder.start();
 
-        ResultFileWriter writer = new ResultFileWriter(finder, this);
+        writer = new ResultFileWriter(finder, this);
         writer.start();
 
         //TODO: Catch IOException and call (overloaded with exception?) stopComparison() to show error
@@ -147,6 +144,12 @@ public class FileComparerUI extends Application
     {
         System.out.println("Stopping comparison...");
         finder.stop();
-//        writer.stop();
+    }
+
+    private void updateProgressBar(ProgressBar progressBar, int numMaxComparisons)
+    {
+        double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles); //TODO: Remove -missedFiles if not necessary/helpful
+        progressBar.setProgress(newProgress);
+        System.out.println(newProgress + " (" + numComparisons + " / " + (numMaxComparisons - missedFiles) + ") -" + missedFiles); ///
     }
 }

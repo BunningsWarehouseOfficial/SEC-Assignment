@@ -16,7 +16,7 @@ public class FileFinder
 
     private Thread thread;
     private ExecutorService comparisonService = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors() * 2); //TODO: Change number of threads
+            Runtime.getRuntime().availableProcessors()); //TODO: Change number of threads
     private BlockingQueue<ComparisonResult> comparisons = new ArrayBlockingQueue<>(1000);
     private static final ComparisonResult POISON = new ComparisonResult();
 
@@ -43,20 +43,22 @@ public class FileFinder
             throw new IllegalArgumentException("Writer thread doesn't exist");
         }
 
-        comparisonService.shutdown();
-        try
-        {
-            System.out.println("Waiting for the service to terminate..."); ///
-            //Force shutdown if natural shutdown takes too long
-            if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
-            {
-                comparisonService.shutdownNow();
-            }
-        }
-        catch (InterruptedException e)
-        {
-            //TODO
-        }
+        comparisonService.shutdownNow(); ///
+//        comparisonService.shutdown();
+//        try
+//        {
+//            System.out.println("Waiting for the service to terminate..."); ///
+//            //Force shutdown if natural shutdown takes too long
+//            if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
+//            {
+//                comparisonService.shutdownNow();
+//            }
+//        }
+//        catch (InterruptedException e)
+//        {
+//            System.out.println("---------FileFinder stop() interrupt"); ///
+//            //TODO
+//        }
 
         thread.interrupt(); //TODO: Test if we need InterruptedException catch block in findFiles()
         thread = null;
@@ -84,7 +86,7 @@ public class FileFinder
                                 textFiles.add(fileStr);
                                 Platform.runLater(() ->
                                 {
-                                    ui.addTextFile(fileStr);
+                                    ui.displayDetail("Found text file to compare: " + fileStr);
                                 });
                             }
                         }
@@ -93,7 +95,7 @@ public class FileFinder
                             //Ignore a file whose size couldn't be checked
                             Platform.runLater(() ->
                             {
-                                ui.addMissedFile(fileStr, "Couldn't determine file size");
+                                ui.displayDetail("Couldn't determine file size for " + fileStr);
                             });
                         }
                     }
@@ -106,13 +108,14 @@ public class FileFinder
             //System.out.println("files: " + numFiles + ", maxComparisons = " + numMaxComparisons); ///
 
             //Start creating threads to compare all the found text files
+            List<Future<String>> futures = new LinkedList<>();
             String[] comparisonFiles = textFiles.toArray(new String[0]);
             for (int ii = 0; ii < comparisonFiles.length - 1; ii++)
             {
                 String comparisonFile = comparisonFiles[ii];
                 int startIndex = ii;
-                /// below
-                Future<String> future = comparisonService.submit(() -> //Submitting comparison callables to thread pool
+                //Submitting comparison callables to thread pool
+                Future<String> future = comparisonService.submit(() ->
                 {
                     try
                     {
@@ -121,54 +124,84 @@ public class FileFinder
                         //Compare the target file to every other file for which a comparison hasn't been made already
                         for (int jj = startIndex + 1; jj < comparisonFiles.length; jj++)
                         {
-                            String targetFile = comparisonFiles[jj];
-                            if (!comparisonFile.equals(targetFile))
+                            try
                             {
-                                String secondaryFile = Files.readString(Paths.get(targetFile));
+                                String targetFile = comparisonFiles[jj];
+                                if (!comparisonFile.equals(targetFile) && !Thread.currentThread().isInterrupted())
+                                {
+                                    String secondaryFile = Files.readString(Paths.get(targetFile));
 
-                                double similarity = calcSimilarity(primaryFile, secondaryFile);
-                                ComparisonResult newComparison = new ComparisonResult(
-                                        comparisonFile, targetFile, similarity);
+                                    double similarity = calcSimilarity(primaryFile, secondaryFile);
+                                    ComparisonResult newComparison = new ComparisonResult(
+                                            comparisonFile, targetFile, similarity);
 
-//                                if (similarity > FileComparerUI.MIN_SIMILARITY)
-//                                {
-                                    comparisons.put(newComparison);
-//                                }
+                                    if (similarity > FileComparerUI.MIN_SIMILARITY)
+                                    {
+                                        comparisons.put(newComparison);
+                                    }
+                                    Platform.runLater(() ->
+                                    {
+                                        ui.addComparison(newComparison);
+                                        ui.incrementProgress(numMaxComparisons);
+                                    });
+                                } else
+                                {
+                                    Platform.runLater(() ->
+                                    {
+                                        ui.displayDetail("Cancelled a comparison thread");
+                                    });
+                                    break;
+                                }
+                            }
+                            catch (OutOfMemoryError e)
+                            {
                                 Platform.runLater(() ->
                                 {
-                                    ui.addComparison(newComparison);
-                                    ui.incrementProgress(numMaxComparisons);
+                                    ui.addMissedComparison(comparisonFile, numMaxComparisons);
                                 });
                             }
                         }
                     }
                     catch(InterruptedException e)
                     {
-                        System.out.println("===X=== INTERRUPT: A comparison task"); ///
-                        //TODO
+                        Platform.runLater(() ->
+                        {
+                            ui.displayDetail("A comparison task was interrupted");
+                        });
                     }
-                    catch(IOException e)
+                    catch (IOException e)
                     {
-                        System.out.println("===> ERROR: " + e.getMessage()); ///
-                        //TODO (perhaps also add inner IOException for secondaryFile)
+                        Platform.runLater(() ->
+                        {
+                            ui.showError("An error occurred while making comparisons for " + comparisonFile +
+                                    "\n\n" + e.getMessage());
+                        });
                     }
-                    return new String(); ///
+                    return comparisonFile;
                 }); //TODO: Perhaps move actual callable code elsewhere?
+                futures.add(future);
             }
 
-            //Wait for all comparison tasks to complete before signalling that the service has finished producing
-            comparisonService.shutdown();
-            while (!comparisonService.isTerminated())
+            //Block and wait for each comparison task to finish
+            for (Future<String> future : futures)
             {
                 try
                 {
-                    Thread.sleep(1000); //TODO: Busy waiting is yuck, use a Future or some shit instead???
+                    future.get();
                 }
-                catch (InterruptedException e) { } //TODO: Make sure this is the right thing to do
+                catch (InterruptedException | ExecutionException e)
+                {
+                    Platform.runLater(() ->
+                    {
+                        ui.showError("An error occurred with comparisons for a file.\n\n" + e.getMessage());
+                    });
+                }
             }
+            comparisonService.shutdown();
+
             try
             {
-                System.out.println("\tputting poison"); ///
+                System.out.println("Finished comparing files"); ///
                 comparisons.put(POISON);
             }
             catch (InterruptedException e)
