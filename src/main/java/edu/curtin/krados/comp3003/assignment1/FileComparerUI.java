@@ -21,6 +21,8 @@ public class FileComparerUI extends Application
 
     private int missedFiles;
     private int numComparisons;
+    private FileFinder finder;
+    private ResultFileWriter writer;
 
     private TableView<ComparisonResult> resultTable = new TableView<>();  
     private ProgressBar progressBar = new ProgressBar();
@@ -28,7 +30,7 @@ public class FileComparerUI extends Application
     @Override
     public void start(Stage stage)
     {
-        stage.setTitle("Papers, Please");
+        stage.setTitle("Plagiarism Detector!");
         stage.setMinWidth(600);
 
         // Create toolbar
@@ -38,7 +40,7 @@ public class FileComparerUI extends Application
         
         // Set up button event handlers.
         compareBtn.setOnAction(event -> crossCompare(stage));
-        stopBtn.setOnAction(event -> stopComparison());
+        stopBtn.setOnAction(event -> stopComparison(finder, writer));
         
         // Initialise progress bar
         progressBar.setProgress(0.0);
@@ -93,6 +95,7 @@ public class FileComparerUI extends Application
 
     public void addComparison(ComparisonResult newComparison)
     {
+        System.out.println("+ comparison"); ///
         if (newComparison.getSimilarity() > MIN_SIMILARITY)
         {
             System.out.println("Found two sufficiently similar files: " + newComparison.getString());
@@ -105,14 +108,12 @@ public class FileComparerUI extends Application
         numComparisons++;
         double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles); //TODO: Remove -missedFiles if not necessary/helpful
         progressBar.setProgress(newProgress);
-        System.out.println(newProgress + " = " + numComparisons + " / " + numMaxComparisons); ///
+        //System.out.println(newProgress + " = " + numComparisons + " / " + numMaxComparisons); ///
     }
 
     //Adapted from code provided in Practical 3
     public void showError(String message)
     {
-        stopComparison();
-
         Alert a = new Alert(Alert.AlertType.ERROR, message, ButtonType.CLOSE);
         a.setResizable(true);
         a.showAndWait();
@@ -133,19 +134,19 @@ public class FileComparerUI extends Application
 
         System.out.println("Comparing files within " + directory + "...");
 
-        //TODO: Add each ComparisonResult to newResults blocking queue to be consumed/written by a file writer thread
-        //      into results.csv
-
         FileFinder finder = new FileFinder(directory.getPath(), this);
-        new Thread(finder, "file-finder-thread").start(); //TODO: Encapsulate into FileFinder
+        finder.start();
+
+        ResultFileWriter writer = new ResultFileWriter(finder, this);
+        writer.start();
 
         //TODO: Catch IOException and call (overloaded with exception?) stopComparison() to show error
     }
     
-    private void stopComparison()
+    private void stopComparison(FileFinder finder, ResultFileWriter writer)
     {
-        //TODO: Stop/interrupt producer thread pool and all threads
-
         System.out.println("Stopping comparison...");
+        finder.stop();
+//        writer.stop();
     }
 }

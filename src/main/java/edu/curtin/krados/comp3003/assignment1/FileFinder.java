@@ -6,22 +6,23 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import javafx.application.Platform;
 
-public class FileFinder implements Runnable
+public class FileFinder
 {
     public static final String[] TEXT_EXTENSIONS = { ".txt", ".md", ".java", ".cs" };
 
-    private String searchPath;
-    private FileComparerUI ui;
-
-    //TODO: Move elsewhere?
-    private List<String> textFiles = new LinkedList<>();
+    private Thread thread;
     private ExecutorService comparisonService = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors() * 2); //TODO: Change number of threads
+    private BlockingQueue<ComparisonResult> comparisons = new ArrayBlockingQueue<>(1000);
+    private static final ComparisonResult POISON = new ComparisonResult();
+
+    private String searchPath;
+    private FileComparerUI ui;
+    private List<String> textFiles = new LinkedList<>();
 
     public FileFinder(String searchPath, FileComparerUI ui)
     {
@@ -29,8 +30,39 @@ public class FileFinder implements Runnable
         this.ui = ui;
     }
 
-    @Override
-    public void run()
+    public void start()
+    {
+        thread = new Thread(this::findFiles, "file-finder-thread");
+        thread.start();
+    }
+
+    public void stop()
+    {
+        if (thread == null)
+        {
+            throw new IllegalArgumentException("Writer thread doesn't exist");
+        }
+
+        comparisonService.shutdown();
+        try
+        {
+            System.out.println("Waiting for the service to terminate..."); ///
+            //Force shutdown if natural shutdown takes too long
+            if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
+            {
+                comparisonService.shutdownNow();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            //TODO
+        }
+
+        thread.interrupt(); //TODO: Test if we need InterruptedException catch block in findFiles()
+        thread = null;
+    }
+
+    public void findFiles()
     {
         //FIXME: App execution doesn't finish if UI is crossed off if FileFinder has begun
         try
@@ -63,7 +95,6 @@ public class FileFinder implements Runnable
                             {
                                 ui.addMissedFile(fileStr, "Couldn't determine file size");
                             });
-                            //TODO: Log to terminal (does it need a .runLater() or something?)
                         }
                     }
                     return FileVisitResult.CONTINUE;
@@ -72,7 +103,7 @@ public class FileFinder implements Runnable
 
             int numFiles = textFiles.size();
             int numMaxComparisons = (numFiles * numFiles - numFiles) / 2;
-            System.out.println("files: " + numFiles + ", maxComparisons = " + numMaxComparisons); ///
+            //System.out.println("files: " + numFiles + ", maxComparisons = " + numMaxComparisons); ///
 
             //Start creating threads to compare all the found text files
             String[] comparisonFiles = textFiles.toArray(new String[0]);
@@ -80,12 +111,14 @@ public class FileFinder implements Runnable
             {
                 String comparisonFile = comparisonFiles[ii];
                 int startIndex = ii;
-                comparisonService.submit(() -> //Submitting comparison callables to thread pool
+                /// below
+                Future<String> future = comparisonService.submit(() -> //Submitting comparison callables to thread pool
                 {
                     try
                     {
                         String primaryFile = Files.readString(Paths.get(comparisonFile));
 
+                        //Compare the target file to every other file for which a comparison hasn't been made already
                         for (int jj = startIndex + 1; jj < comparisonFiles.length; jj++)
                         {
                             String targetFile = comparisonFiles[jj];
@@ -97,6 +130,10 @@ public class FileFinder implements Runnable
                                 ComparisonResult newComparison = new ComparisonResult(
                                         comparisonFile, targetFile, similarity);
 
+//                                if (similarity > FileComparerUI.MIN_SIMILARITY)
+//                                {
+                                    comparisons.put(newComparison);
+//                                }
                                 Platform.runLater(() ->
                                 {
                                     ui.addComparison(newComparison);
@@ -105,24 +142,59 @@ public class FileFinder implements Runnable
                             }
                         }
                     }
+                    catch(InterruptedException e)
+                    {
+                        System.out.println("===X=== INTERRUPT: A comparison task"); ///
+                        //TODO
+                    }
                     catch(IOException e)
                     {
                         System.out.println("===> ERROR: " + e.getMessage()); ///
                         //TODO (perhaps also add inner IOException for secondaryFile)
                     }
+                    return new String(); ///
                 }); //TODO: Perhaps move actual callable code elsewhere?
+            }
+
+            //Wait for all comparison tasks to complete before signalling that the service has finished producing
+            comparisonService.shutdown();
+            while (!comparisonService.isTerminated())
+            {
+                try
+                {
+                    Thread.sleep(1000); //TODO: Busy waiting is yuck, use a Future or some shit instead???
+                }
+                catch (InterruptedException e) { } //TODO: Make sure this is the right thing to do
+            }
+            try
+            {
+                System.out.println("\tputting poison"); ///
+                comparisons.put(POISON);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("??? ??? FAILED TO PUT POISON"); ///
+                //TODO: Signal UI to end any threads dependent on poison (i.e. FileWriter)?
             }
         }
         catch(IOException e)
         {
             Platform.runLater(() ->
             {
-                // This error handling is a bit quick-and-dirty,
-                // but it will suffice here. TODO: Fix so it isn't quick-and-dirty... maybe?
-                //ui.showError(e.getClass().getName() + ": " + e.getMessage());
                 ui.showError("An error occurred while finding files to compare.\n\n" + e.getMessage());
             });
+            stop(); //TODO: Test/check this doesn't break weirdly
         }
+    }
+
+    public ComparisonResult getNextComparison() throws InterruptedException
+    {
+        ComparisonResult comparison = comparisons.take();
+        if (comparison == POISON)
+        {
+            comparison = null;
+        }
+        return comparison;
     }
 
     //Adapted from code by EboMike, https://stackoverflow.com/a/3571239/12350950 (accessed 15 September 2021)

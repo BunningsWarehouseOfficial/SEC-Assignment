@@ -6,6 +6,12 @@ public class ComparisonResult
     private final String file2;
     private final double similarity;
     
+    public ComparisonResult()
+    {
+        this.file1 = null;
+        this.file2 = null;
+        this.similarity = 0.0;
+    }
     public ComparisonResult(String file1, String file2, double similarity)
     {
         this.file1 = file1;

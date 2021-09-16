@@ -4,3 +4,4 @@ TODO: Add completion text next to the right of progress bar, e.g. "24.83%"
 BEFORE SUBMISSION
 TODO: Add README.txt file describing how to compile and run the program
 TODO: Find and delete/replace all lines followed by "///"
+TODO: "docs: remove leftover TODOs"
