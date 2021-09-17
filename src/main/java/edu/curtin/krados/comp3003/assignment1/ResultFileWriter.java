@@ -9,10 +9,10 @@ public class ResultFileWriter
     public static final String OUTPUT_FILENAME = "results.csv";
 
     private Thread thread;
-    private FileFinder producer;
+    private FileComparer producer;
     private FileComparerUI ui;
 
-    public ResultFileWriter(FileFinder producer, FileComparerUI ui)
+    public ResultFileWriter(FileComparer producer, FileComparerUI ui)
     {
         this.producer = producer;
         this.ui = ui;

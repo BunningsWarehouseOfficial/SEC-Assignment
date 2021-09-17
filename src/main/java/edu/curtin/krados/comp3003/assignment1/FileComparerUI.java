@@ -91,7 +91,7 @@ public class FileComparerUI extends Application
     {
         if (newComparison.getSimilarity() > MIN_SIMILARITY)
         {
-            System.out.println("Found two sufficiently similar files: " + newComparison.getString());
+//          System.out.println("Found two sufficiently similar files: " + newComparison.getString());
             resultTable.getItems().add(newComparison);
         }
     }
@@ -103,7 +103,7 @@ public class FileComparerUI extends Application
     }
 
     public void incrementProgress(int numMaxComparisons)
-    { //FIXME: Progress bar doesn't fill completely when searching GitHub directory (stuck at 642/780... nope, 675)
+    {
         numComparisons++;
         updateProgressBar(progressBar, numMaxComparisons);
     }
@@ -123,19 +123,19 @@ public class FileComparerUI extends Application
         numComparisons = 0;
         missedFiles = 0;
 
+        //TODO: Reset UI table after each comparison
+
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File("."));
         dc.setTitle("Choose directory");
         File directory = dc.showDialog(stage);
-        //FIXME: ^^ NullPointerException thrown by this if you press cancel in pop up (LOW PRIORITY)
 
-        System.out.println("Comparing files within " + directory + "...");
-
-        finder = new FileFinder(directory.getPath(), this);
-        finder.start();
-
-        writer = new ResultFileWriter(finder, this);
-        writer.start();
+        if (directory != null)
+        {
+            System.out.println("Comparing files within " + directory + "...");
+            finder = new FileFinder(directory.getPath(), this);
+            finder.start();
+        }
 
         //TODO: Catch IOException and call (overloaded with exception?) stopComparison() to show error
     }
@@ -148,7 +148,7 @@ public class FileComparerUI extends Application
 
     private void updateProgressBar(ProgressBar progressBar, int numMaxComparisons)
     {
-        double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles); //TODO: Remove -missedFiles if not necessary/helpful
+        double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles);
         progressBar.setProgress(newProgress);
     }
 }
