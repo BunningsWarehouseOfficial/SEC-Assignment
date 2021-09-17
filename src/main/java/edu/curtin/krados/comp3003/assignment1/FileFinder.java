@@ -45,7 +45,7 @@ public class FileFinder
             comparer.stop();
         }
 
-        thread.interrupt(); //TODO: Test if we need InterruptedException catch block in findFiles()
+        thread.interrupt();
         thread = null;
     }
 
@@ -68,19 +68,13 @@ public class FileFinder
                             if (Files.size(file) > 0)
                             {
                                 textFiles.add(fileStr);
-                                Platform.runLater(() ->
-                                {
-                                    ui.displayDetail("Found text file to compare: " + fileStr);
-                                });
+                                Platform.runLater(() -> ui.displayDetail("Found text file to compare: " + fileStr));
                             }
                         }
                         catch (IOException e)
                         {
                             //Ignore a file whose size couldn't be checked
-                            Platform.runLater(() ->
-                            {
-                                ui.displayDetail("Couldn't determine file size for " + fileStr);
-                            });
+                            Platform.runLater(() -> ui.displayDetail("Couldn't determine file size for " + fileStr));
                         }
                     }
                     return FileVisitResult.CONTINUE;
@@ -99,11 +93,9 @@ public class FileFinder
         }
         catch(IOException e)
         {
-            Platform.runLater(() ->
-            {
-                ui.showError("An error occurred while finding files to compare.\n\n" + e.getMessage());
-            });
-            stop(); //TODO: Test/check this doesn't break weirdly
+            Platform.runLater(() -> ui.showError("An error occurred while finding files to compare.\n\n"
+                    + e.getMessage()));
+            stop();
         }
     }
 

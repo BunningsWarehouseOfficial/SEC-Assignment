@@ -42,10 +42,7 @@ public class FileComparer
         comparisonService.shutdown();
         try
         {
-            Platform.runLater(() ->
-            {
-                ui.displayDetail("Waiting for the currently running comparisons to terminate...");
-            });
+            Platform.runLater(() -> ui.displayDetail("Waiting for the currently running comparisons to terminate..."));
             //Force shutdown if natural shutdown takes too long
             if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
             {
@@ -54,10 +51,7 @@ public class FileComparer
         }
         catch (InterruptedException e)
         {
-            Platform.runLater(() ->
-            {
-                ui.displayDetail("File finding/reading/comparing shutdown process was interrupted");
-            });
+            Platform.runLater(() -> ui.displayDetail("File finding/reading/comparing shutdown process was interrupted"));
         }
 
         thread.interrupt(); //TODO: Test if we need InterruptedException catch block in findFiles()
@@ -106,36 +100,24 @@ public class FileComparer
                                 });
                             } else
                             {
-                                Platform.runLater(() ->
-                                {
-                                    ui.displayDetail("Cancelled a comparison thread");
-                                });
+                                Platform.runLater(() -> ui.displayDetail("Cancelled a comparison thread"));
                                 break;
                             }
                         }
                         catch (OutOfMemoryError e)
                         {
-                            Platform.runLater(() ->
-                            {
-                                ui.addMissedComparison(comparisonFile, numMaxComparisons);
-                            });
+                            Platform.runLater(() -> ui.addMissedComparison(comparisonFile, numMaxComparisons));
                         }
                     }
                 }
                 catch(InterruptedException e)
                 {
-                    Platform.runLater(() ->
-                    {
-                        ui.displayDetail("A comparison task was interrupted");
-                    });
+                    Platform.runLater(() -> ui.displayDetail("A comparison task was interrupted"));
                 }
                 catch (IOException e)
                 {
-                    Platform.runLater(() ->
-                    {
-                        ui.showError("An error occurred while making comparisons for " + comparisonFile +
-                                "\n\n" + e.getMessage());
-                    });
+                    Platform.runLater(() -> ui.showError("An error occurred while making comparisons for "
+                            + comparisonFile + "\n\n" + e.getMessage()));
                 }
                 return comparisonFile;
             });
@@ -169,9 +151,7 @@ public class FileComparer
 
         try
         {
-            Platform.runLater(() -> {
-                ui.displayDetail("Finished comparing files");
-            });
+            Platform.runLater(() -> ui.displayDetail("Finished comparing files"));
             comparisons.put(POISON);
         }
         catch (InterruptedException e)

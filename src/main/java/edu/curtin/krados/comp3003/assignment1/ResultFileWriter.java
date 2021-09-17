@@ -54,10 +54,7 @@ public class ResultFileWriter
             }
             catch(InterruptedException e)
             {
-                Platform.runLater(() ->
-                {
-                    ui.displayDetail("Writing results to " + OUTPUT_FILENAME + " was interrupted");
-                });
+                Platform.runLater(() -> ui.displayDetail("Writing results to " + OUTPUT_FILENAME + " was interrupted"));
             }
             //TODO: Need contingency for thread to end if POISON wasn't successfully placed in blocking queue
         }
@@ -83,9 +80,6 @@ public class ResultFileWriter
 
     private void showError(String error)
     {
-        Platform.runLater(() ->
-        {
-            ui.showError("An error occurred while writing a result to the output file.\n\n" + error);
-        });
+        Platform.runLater(() -> ui.showError("An error occurred while writing a result to the output file.\n\n" + error));
     }
 }
