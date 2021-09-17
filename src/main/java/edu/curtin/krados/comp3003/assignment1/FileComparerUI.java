@@ -22,7 +22,6 @@ public class FileComparerUI extends Application
     private int numComparisons;
     private int missedFiles = 0;
     private FileFinder finder;
-    private ResultFileWriter writer;
 
     private TableView<ComparisonResult> resultTable = new TableView<>();  
     private ProgressBar progressBar = new ProgressBar();
@@ -40,7 +39,7 @@ public class FileComparerUI extends Application
         
         // Set up button event handlers.
         compareBtn.setOnAction(event -> crossCompare(stage));
-        stopBtn.setOnAction(event -> stopComparison(finder, writer));
+        stopBtn.setOnAction(event -> stopComparison(finder));
         
         // Initialise progress bar
         progressBar.setProgress(0.0);
@@ -118,12 +117,13 @@ public class FileComparerUI extends Application
     
     private void crossCompare(Stage stage)
     {
+        //Reset results table
+        resultTable.getItems().clear();
+
         //Reset progress bar
         progressBar.setProgress(0.0);
         numComparisons = 0;
         missedFiles = 0;
-
-        //TODO: Reset UI table after each comparison
 
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File("."));
@@ -132,15 +132,13 @@ public class FileComparerUI extends Application
 
         if (directory != null)
         {
-            System.out.println("Comparing files within " + directory + "...");
+            System.out.println("\nComparing files within " + directory + "...");
             finder = new FileFinder(directory.getPath(), this);
             finder.start();
         }
-
-        //TODO: Catch IOException and call (overloaded with exception?) stopComparison() to show error
     }
     
-    private void stopComparison(FileFinder finder, ResultFileWriter writer)
+    private void stopComparison(FileFinder finder)
     {
         System.out.println("Stopping comparison...");
         finder.stop();
