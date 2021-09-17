@@ -1,3 +1,5 @@
+TODO: Encapsulate file comparisons into new class
+
 OPTIONAL
 TODO: Add completion text next to the right of progress bar, e.g. "24.83%"
 

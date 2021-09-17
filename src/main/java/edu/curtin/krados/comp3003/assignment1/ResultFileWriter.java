@@ -43,7 +43,6 @@ public class ResultFileWriter
                     if (result != null)
                     {
                         String newLine = result.getFile1() + "," + result.getFile2() + "," + result.getSimilarity();
-                        System.out.println("> WRITING result"); ///
                         pw.println(newLine);
                     }
                     else
@@ -55,8 +54,10 @@ public class ResultFileWriter
             }
             catch(InterruptedException e)
             {
-                System.out.println("===X=== INTERRUPT: Writer"); ///
-                //TODO
+                Platform.runLater(() ->
+                {
+                    ui.displayDetail("Writing results to " + OUTPUT_FILENAME + " was interrupted");
+                });
             }
             //TODO: Need contingency for thread to end if POISON wasn't successfully placed in blocking queue
         }

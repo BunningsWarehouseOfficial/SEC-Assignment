@@ -43,22 +43,21 @@ public class FileFinder
             throw new IllegalArgumentException("Writer thread doesn't exist");
         }
 
-        comparisonService.shutdownNow(); ///
-//        comparisonService.shutdown();
-//        try
-//        {
-//            System.out.println("Waiting for the service to terminate..."); ///
-//            //Force shutdown if natural shutdown takes too long
-//            if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
-//            {
-//                comparisonService.shutdownNow();
-//            }
-//        }
-//        catch (InterruptedException e)
-//        {
-//            System.out.println("---------FileFinder stop() interrupt"); ///
-//            //TODO
-//        }
+        //comparisonService.shutdownNow(); ///
+        comparisonService.shutdown();
+        try
+        {
+            System.out.println("Waiting for the currently running comparisons to terminate..."); ///
+            //Force shutdown if natural shutdown takes too long
+            if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
+            {
+                comparisonService.shutdownNow();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            System.out.println("---------FileFinder stop() interrupt"); ///TODO
+        }
 
         thread.interrupt(); //TODO: Test if we need InterruptedException catch block in findFiles()
         thread = null;
@@ -66,7 +65,6 @@ public class FileFinder
 
     public void findFiles()
     {
-        //FIXME: App execution doesn't finish if UI is crossed off if FileFinder has begun
         try
         {
             // Recurse through the directory tree
@@ -103,112 +101,9 @@ public class FileFinder
                 }
             });
 
-            int numFiles = textFiles.size();
-            int numMaxComparisons = (numFiles * numFiles - numFiles) / 2;
-            //System.out.println("files: " + numFiles + ", maxComparisons = " + numMaxComparisons); ///
-
-            //Start creating threads to compare all the found text files
-            List<Future<String>> futures = new LinkedList<>();
+            //Compare all the found text files //TODO: Make new class to handle this for decoupling?
             String[] comparisonFiles = textFiles.toArray(new String[0]);
-            for (int ii = 0; ii < comparisonFiles.length - 1; ii++)
-            {
-                String comparisonFile = comparisonFiles[ii];
-                int startIndex = ii;
-                //Submitting comparison callables to thread pool
-                Future<String> future = comparisonService.submit(() ->
-                {
-                    try
-                    {
-                        String primaryFile = Files.readString(Paths.get(comparisonFile));
-
-                        //Compare the target file to every other file for which a comparison hasn't been made already
-                        for (int jj = startIndex + 1; jj < comparisonFiles.length; jj++)
-                        {
-                            try
-                            {
-                                String targetFile = comparisonFiles[jj];
-                                if (!comparisonFile.equals(targetFile) && !Thread.currentThread().isInterrupted())
-                                {
-                                    String secondaryFile = Files.readString(Paths.get(targetFile));
-
-                                    double similarity = calcSimilarity(primaryFile, secondaryFile);
-                                    ComparisonResult newComparison = new ComparisonResult(
-                                            comparisonFile, targetFile, similarity);
-
-                                    if (similarity > FileComparerUI.MIN_SIMILARITY)
-                                    {
-                                        comparisons.put(newComparison);
-                                    }
-                                    Platform.runLater(() ->
-                                    {
-                                        ui.addComparison(newComparison);
-                                        ui.incrementProgress(numMaxComparisons);
-                                    });
-                                } else
-                                {
-                                    Platform.runLater(() ->
-                                    {
-                                        ui.displayDetail("Cancelled a comparison thread");
-                                    });
-                                    break;
-                                }
-                            }
-                            catch (OutOfMemoryError e)
-                            {
-                                Platform.runLater(() ->
-                                {
-                                    ui.addMissedComparison(comparisonFile, numMaxComparisons);
-                                });
-                            }
-                        }
-                    }
-                    catch(InterruptedException e)
-                    {
-                        Platform.runLater(() ->
-                        {
-                            ui.displayDetail("A comparison task was interrupted");
-                        });
-                    }
-                    catch (IOException e)
-                    {
-                        Platform.runLater(() ->
-                        {
-                            ui.showError("An error occurred while making comparisons for " + comparisonFile +
-                                    "\n\n" + e.getMessage());
-                        });
-                    }
-                    return comparisonFile;
-                }); //TODO: Perhaps move actual callable code elsewhere?
-                futures.add(future);
-            }
-
-            //Block and wait for each comparison task to finish
-            for (Future<String> future : futures)
-            {
-                try
-                {
-                    future.get();
-                }
-                catch (InterruptedException | ExecutionException e)
-                {
-                    Platform.runLater(() ->
-                    {
-                        ui.showError("An error occurred with comparisons for a file.\n\n" + e.getMessage());
-                    });
-                }
-            }
-            comparisonService.shutdown();
-
-            try
-            {
-                System.out.println("Finished comparing files"); ///
-                comparisons.put(POISON);
-            }
-            catch (InterruptedException e)
-            {
-                System.out.println("??? ??? FAILED TO PUT POISON"); ///
-                //TODO: Signal UI to end any threads dependent on poison (i.e. FileWriter)?
-            }
+            compareFiles(comparisonFiles);
         }
         catch(IOException e)
         {
@@ -228,6 +123,123 @@ public class FileFinder
             comparison = null;
         }
         return comparison;
+    }
+
+    private void compareFiles(String[] comparisonFiles)
+    {
+        List<Future<String>> futures = new LinkedList<>();
+        int numFiles = comparisonFiles.length;
+        int numMaxComparisons = (numFiles * numFiles - numFiles) / 2;
+
+        for (int ii = 0; ii < comparisonFiles.length - 1; ii++)
+        {
+            String comparisonFile = comparisonFiles[ii];
+            int startIndex = ii;
+            //Submitting comparison callables to thread pool
+            Future<String> future = comparisonService.submit(() ->
+            {
+                try
+                {
+                    String primaryFile = Files.readString(Paths.get(comparisonFile));
+
+                    //Compare the target file to every other file for which a comparison hasn't been made already
+                    for (int jj = startIndex + 1; jj < comparisonFiles.length; jj++)
+                    {
+                        try
+                        {
+                            String targetFile = comparisonFiles[jj];
+                            if (!comparisonFile.equals(targetFile) && !Thread.currentThread().isInterrupted())
+                            {
+                                String secondaryFile = Files.readString(Paths.get(targetFile));
+
+                                double similarity = calcSimilarity(primaryFile, secondaryFile);
+                                ComparisonResult newComparison = new ComparisonResult(
+                                        comparisonFile, targetFile, similarity);
+
+                                if (similarity > FileComparerUI.MIN_SIMILARITY)
+                                {
+                                    comparisons.put(newComparison);
+                                }
+                                Platform.runLater(() ->
+                                {
+                                    ui.addComparison(newComparison);
+                                    ui.incrementProgress(numMaxComparisons);
+                                });
+                            } else
+                            {
+                                Platform.runLater(() ->
+                                {
+                                    ui.displayDetail("Cancelled a comparison thread");
+                                });
+                                break;
+                            }
+                        }
+                        catch (OutOfMemoryError e)
+                        {
+                            Platform.runLater(() ->
+                            {
+                                ui.addMissedComparison(comparisonFile, numMaxComparisons);
+                            });
+                        }
+                    }
+                }
+                catch(InterruptedException e)
+                {
+                    Platform.runLater(() ->
+                    {
+                        ui.displayDetail("A comparison task was interrupted");
+                    });
+                }
+                catch (IOException e)
+                {
+                    Platform.runLater(() ->
+                    {
+                        ui.showError("An error occurred while making comparisons for " + comparisonFile +
+                                "\n\n" + e.getMessage());
+                    });
+                }
+                return comparisonFile;
+            });
+            futures.add(future);
+        }
+
+        //Block and wait for each comparison task to finish
+        for (Future<String> future : futures)
+        {
+            try
+            {
+                future.get();
+            }
+            catch (InterruptedException ignored) { }
+            catch (ExecutionException e)
+            {
+                Platform.runLater(() ->
+                {
+                    if (e.getMessage() != null)
+                    {
+                        ui.showError("An error occurred with comparisons for a file.\n\n" + e.getMessage());
+                    }
+                    else
+                    {
+                        ui.showError("An error occurred with comparisons for a file.");
+                    }
+                });
+            }
+        }
+        comparisonService.shutdown();
+
+        try
+        {
+            Platform.runLater(() -> {
+                ui.displayDetail("Finished comparing files");
+            });
+            comparisons.put(POISON);
+        }
+        catch (InterruptedException e)
+        {
+            System.out.println("??? ??? FAILED TO PUT POISON"); ///
+            //TODO: Signal UI to end any threads dependent on poison (i.e. FileWriter)?
+        }
     }
 
     //Adapted from code by EboMike, https://stackoverflow.com/a/3571239/12350950 (accessed 15 September 2021)

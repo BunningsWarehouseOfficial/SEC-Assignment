@@ -150,6 +150,5 @@ public class FileComparerUI extends Application
     {
         double newProgress = (double)numComparisons / (double)(numMaxComparisons - missedFiles); //TODO: Remove -missedFiles if not necessary/helpful
         progressBar.setProgress(newProgress);
-        System.out.println(newProgress + " (" + numComparisons + " / " + (numMaxComparisons - missedFiles) + ") -" + missedFiles); ///
     }
 }
