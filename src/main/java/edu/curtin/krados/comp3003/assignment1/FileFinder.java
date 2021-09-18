@@ -6,10 +6,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
 
 import javafx.application.Platform;
 
+/**
+ * Finds each text file that is not empty and initiates the file comparison process so that the details of the found
+ * files can be put use.
+ */
 public class FileFinder
 {
     public static final String[] TEXT_EXTENSIONS = { ".txt", ".md", ".java", ".cs" };
@@ -49,12 +52,15 @@ public class FileFinder
         thread = null;
     }
 
+    /**
+     * Recursively walks through the chosen directory to find any valid text files which can be later compared.
+     */
     public void findFiles()
     {
         try
         {
             // Recurse through the directory tree
-            Files.walkFileTree(Paths.get(searchPath), new SimpleFileVisitor<Path>()
+            Files.walkFileTree(Paths.get(searchPath), new SimpleFileVisitor<>()
             {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
@@ -99,7 +105,11 @@ public class FileFinder
         }
     }
 
-    //Adapted from code by EboMike, https://stackoverflow.com/a/3571239/12350950 (accessed 15 September 2021)
+    /**
+     * Checks that a file is a text file, as defined by the TEXT_EXTENSIONS constant.
+     *
+     * Adapted from code by EboMike, https://stackoverflow.com/a/3571239/12350950 (accessed 15 September 2021)
+     */
     private boolean isTextFile(String fileStr)
     {
         boolean isTextFile = false;

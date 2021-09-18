@@ -9,6 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
 
+/**
+ * A producer class responsible for, under its own thread, comparing every provided text file with every other provided
+ * text file to measure their similarity.
+ */
 public class FileComparer
 {
     private Thread thread;
@@ -39,11 +43,12 @@ public class FileComparer
             throw new IllegalArgumentException("Writer thread doesn't exist");
         }
 
+        //TODO: Change this to just be shutdownNow()?
         comparisonService.shutdown();
         try
         {
             Platform.runLater(() -> ui.displayDetail("Waiting for the currently running comparisons to terminate..."));
-            //Force shutdown if natural shutdown takes too long
+            //Force shutdown if remaining executor tasks take too long to shutdown
             if (!comparisonService.awaitTermination(3, TimeUnit.SECONDS))
             {
                 comparisonService.shutdownNow();
@@ -58,36 +63,44 @@ public class FileComparer
         thread = null;
     }
 
+    /**
+     * The task comparing the files. An executor service creates n - 1 new threads to compare each file with all other
+     * files while avoiding redundant, symmetric comparisons.
+     */
     private void compareFiles()
     {
         List<Future<String>> futures = new LinkedList<>();
         int numFiles = comparisonFiles.length;
         int numMaxComparisons = (numFiles * numFiles - numFiles) / 2;
 
+        /*Iterate through each file to select the primary file; the final file is excluded, as it will have already been
+        * compared with all other files anyway*/
         for (int ii = 0; ii < comparisonFiles.length - 1; ii++)
         {
-            String comparisonFile = comparisonFiles[ii];
+            String primaryFilename = comparisonFiles[ii];
+
+            //Submitting comparison callables to the thread pool
             int startIndex = ii;
-            //Submitting comparison callables to thread pool
             Future<String> future = comparisonService.submit(() ->
             {
                 try
                 {
-                    String primaryFile = Files.readString(Paths.get(comparisonFile));
+                    String primaryFile = Files.readString(Paths.get(primaryFilename));
 
-                    //Compare the target file to every other file for which a comparison hasn't been made already
+                    //Compare the primary file to all other target files for which a comparison hasn't been made already
                     for (int jj = startIndex + 1; jj < comparisonFiles.length; jj++)
                     {
                         try
                         {
-                            String targetFile = comparisonFiles[jj];
-                            if (!comparisonFile.equals(targetFile) && !Thread.currentThread().isInterrupted())
+                            String targetFilename = comparisonFiles[jj];
+                            //Make sure a file isn't compared with itself
+                            if (!primaryFilename.equals(targetFilename) && !Thread.currentThread().isInterrupted())
                             {
-                                String secondaryFile = Files.readString(Paths.get(targetFile));
+                                String targetFile = Files.readString(Paths.get(targetFilename));
 
-                                double similarity = calcSimilarity(primaryFile, secondaryFile);
+                                double similarity = calcSimilarity(primaryFile, targetFile);
                                 ComparisonResult newComparison = new ComparisonResult(
-                                        comparisonFile, targetFile, similarity);
+                                        primaryFilename, targetFilename, similarity);
 
                                 if (similarity > FileComparerUI.MIN_SIMILARITY)
                                 {
@@ -98,7 +111,8 @@ public class FileComparer
                                     ui.addComparison(newComparison);
                                     ui.incrementProgress(numMaxComparisons);
                                 });
-                            } else
+                            }
+                            else
                             {
                                 Platform.runLater(() -> ui.displayDetail("Cancelled a comparison thread"));
                                 break;
@@ -106,7 +120,7 @@ public class FileComparer
                         }
                         catch (OutOfMemoryError e)
                         {
-                            Platform.runLater(() -> ui.addMissedComparison(comparisonFile, numMaxComparisons));
+                            Platform.runLater(() -> ui.addMissedComparison(primaryFilename, numMaxComparisons));
                         }
                     }
                 }
@@ -117,14 +131,14 @@ public class FileComparer
                 catch (IOException e)
                 {
                     Platform.runLater(() -> ui.showError("An error occurred while making comparisons for "
-                            + comparisonFile + "\n\n" + e.getMessage()));
+                            + primaryFilename + "\n\n" + e.getMessage()));
                 }
-                return comparisonFile;
+                return primaryFilename;
             });
             futures.add(future);
         }
 
-        //Block and wait for each comparison task to finish
+        //Block and wait for each comparison task to finish before shutting down the executor service and its threads
         for (Future<String> future : futures)
         {
             try
@@ -149,6 +163,7 @@ public class FileComparer
         }
         comparisonService.shutdown();
 
+        //Signal to any consumers that this object has stopped producing
         try
         {
             Platform.runLater(() -> ui.displayDetail("Finished comparing files"));
@@ -172,9 +187,13 @@ public class FileComparer
         }
     }
 
+    /**
+     * Blocking getter method for retrieving (consuming) a ComparisonResult.
+     */
     public ComparisonResult getNextComparison() throws InterruptedException
     {
         ComparisonResult comparison = comparisons.take();
+        //Signal to any consumers that this object has stopped producing
         if (comparison == POISON)
         {
             comparison = null;
@@ -183,9 +202,8 @@ public class FileComparer
     }
 
     /**
-     * Implementation of the LCS Dynamic Programming Algorithm for determining the similarity between two files.
-     *
-     * Source: assignment specification.
+     * Implementation of the LCS Dynamic Programming Algorithm for determining how similar two files (i.e. strings) are.
+     * Based on pseudocode provided in assignment specification.
      */
     private double calcSimilarity(String file1, String file2)
     {

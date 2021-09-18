@@ -4,6 +4,9 @@ import javafx.application.Platform;
 
 import java.io.*;
 
+/**
+ * Responsible for writing the results of file similarity comparisons to an output file under its own thread.
+ * */
 public class ResultFileWriter
 {
     public static final String OUTPUT_FILENAME = "results.csv";
@@ -24,6 +27,9 @@ public class ResultFileWriter
         thread.start();
     }
 
+    /**
+     * A task for writing comparison results to an output file.
+     */
     private void writeResults()
     {
         FileWriter fw = null;
@@ -63,6 +69,7 @@ public class ResultFileWriter
         }
         finally
         {
+            //Make sure that the FileWriter closes, ending the thread
             if (fw != null)
             {
                 try

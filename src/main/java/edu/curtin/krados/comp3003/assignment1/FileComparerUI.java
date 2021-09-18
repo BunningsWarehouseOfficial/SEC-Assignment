@@ -5,11 +5,15 @@ import javafx.beans.property.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 
+/**
+ *
+ */
 public class FileComparerUI extends Application
 {
     public static void main(String[] args)
@@ -95,9 +99,15 @@ public class FileComparerUI extends Application
         }
     }
 
+    /**
+     * Ensures that incomplete comparisons are taken into account by the progress bar.
+     *
+     * TODO: A popup or counter in the UI indicating how many comparisons were incomplete.
+     */
     public void addMissedComparison(String missedFile, int numMaxComparisons)
     {
         missedFiles++;
+//      System.out.println("A comparison for the following file couldn't be completed: " + missedFile);
         updateProgressBar(progressBar, numMaxComparisons);
     }
 
@@ -114,7 +124,11 @@ public class FileComparerUI extends Application
         a.setResizable(true);
         a.showAndWait();
     }
-    
+
+    /**
+     * Initiate the file comparison process by first prompting the user for a directory selection and then initiating
+     * the FileFinder to locate all text files in the chosen directory.
+     */
     private void crossCompare(Stage stage)
     {
         //Reset results table
@@ -125,11 +139,11 @@ public class FileComparerUI extends Application
         numComparisons = 0;
         missedFiles = 0;
 
+        //Prompt the user to select a directory to search for text files in
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File("."));
         dc.setTitle("Choose directory");
         File directory = dc.showDialog(stage);
-
         if (directory != null)
         {
             System.out.println("\nComparing files within " + directory + "...");

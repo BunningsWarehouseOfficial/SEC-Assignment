@@ -1,5 +1,8 @@
 package edu.curtin.krados.comp3003.assignment1;
 
+/**
+ * Object for storing the results of a successful comparison between two text files.
+ */
 public class ComparisonResult
 {
     private final String file1;
@@ -22,8 +25,4 @@ public class ComparisonResult
     public String getFile1() { return file1; }
     public String getFile2() { return file2; }
     public double getSimilarity() { return similarity; }
-    public String getString()
-    {
-        return similarity + ", " + file1 + ", " + file2;
-    }
 }
