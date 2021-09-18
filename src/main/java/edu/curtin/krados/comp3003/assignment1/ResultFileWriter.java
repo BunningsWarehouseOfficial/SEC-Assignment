@@ -56,7 +56,6 @@ public class ResultFileWriter
             {
                 Platform.runLater(() -> ui.displayDetail("Writing results to " + OUTPUT_FILENAME + " was interrupted"));
             }
-            //TODO: Need contingency for thread to end if POISON wasn't successfully placed in blocking queue
         }
         catch(IOException e)
         {

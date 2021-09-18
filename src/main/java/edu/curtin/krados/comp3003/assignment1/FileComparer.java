@@ -13,7 +13,7 @@ public class FileComparer
 {
     private Thread thread;
     private ExecutorService comparisonService = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors()); //TODO: Change number of threads
+            Runtime.getRuntime().availableProcessors());
     private BlockingQueue<ComparisonResult> comparisons = new ArrayBlockingQueue<>(1000);
     private static final ComparisonResult POISON = new ComparisonResult();
 
@@ -54,7 +54,7 @@ public class FileComparer
             Platform.runLater(() -> ui.displayDetail("File finding/reading/comparing shutdown process was interrupted"));
         }
 
-        thread.interrupt(); //TODO: Test if we need InterruptedException catch block in findFiles()
+        thread.interrupt();
         thread = null;
     }
 
