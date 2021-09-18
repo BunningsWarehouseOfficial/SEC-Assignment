@@ -1,5 +1,5 @@
 # SEC Assignment, Semester 2 2021
-Software Engineering Concepts assignment by Krisian Rados (19764285).
+Software Engineering Concepts assignment by Kristian Rados (19764285).
 
 ## How to Run
 ### Option 1
