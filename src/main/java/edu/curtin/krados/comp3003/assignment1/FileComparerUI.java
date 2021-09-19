@@ -5,14 +5,13 @@ import javafx.beans.property.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
-import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 
 /**
- *
+ * Initialises the application and manages its user interface, tracking comparison progress along the way.
  */
 public class FileComparerUI extends Application
 {

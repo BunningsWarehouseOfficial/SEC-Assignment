@@ -43,7 +43,7 @@ public class FileComparer
             throw new IllegalArgumentException("Writer thread doesn't exist");
         }
 
-        //TODO: Change this to just be shutdownNow()?
+        //TODO: Change this whole block to just be shutdownNow() and don't wait? Assignment spec a little unclear
         comparisonService.shutdown();
         try
         {
