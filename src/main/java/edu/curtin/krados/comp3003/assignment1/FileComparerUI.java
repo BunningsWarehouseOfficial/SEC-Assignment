@@ -154,8 +154,11 @@ public class FileComparerUI extends Application
     
     private void stopComparison(FileFinder finder)
     {
-        System.out.println("Stopping comparison...");
-        finder.stop();
+        if (finder != null)
+        {
+            System.out.println("Stopping comparison...");
+            finder.stop();
+        }
     }
 
     private void updateProgressBar(ProgressBar progressBar, int numMaxComparisons)

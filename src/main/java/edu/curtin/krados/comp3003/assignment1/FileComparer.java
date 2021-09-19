@@ -53,6 +53,7 @@ public class FileComparer
             {
                 comparisonService.shutdownNow();
             }
+            Platform.runLater(() -> ui.displayDetail("Any currently running comparisons have been stopped"));
         }
         catch (InterruptedException e)
         {
